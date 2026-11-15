@@ -289,7 +289,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <select id="subjectSelect"></select>
       <label>الملف</label>
       <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
-        <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 700KB</small>
+        <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 4MB</small>
       </div>
       <input type="file" id="fileInput" class="hidden">
       <div class="prog" id="prog"><i></i></div>
@@ -318,6 +318,7 @@ const SUBJECTS = {
   Mechanics:{ar:"الميكانيكا",icon:"cog",c:"#ef4444"},
   Math:{ar:"الرياضيات",icon:"math",c:"#8b5cf6"}
 };
+const MAX_FILE = 4 * 1024 * 1024, CHUNK = 300 * 1024; // 4MB max, stored as 300KB chunks (each in its own bin)
 const OTP_TTL = 10 * 60 * 1000, MAX_TRIES = 5, MAX_DEVICES = 6, SESSION_KEY = "sv_session";
 
 let authMode = "register", flow = "register";
@@ -613,6 +614,19 @@ async function syncWithServer() {
   buildTabs(); renderFileList(d.files);
 }
 
+/* chunked file storage: each chunk lives in its own bin so size isn't limited by one bin */
+async function createBin(payload, name) {
+  const r = await fetch("https://api.jsonbin.io/v3/b", { method: "POST", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY, "X-Bin-Private": "true", "X-Bin-Name": name }, body: JSON.stringify(payload) });
+  if (!r.ok) throw new Error("bin " + r.status);
+  return (await r.json()).metadata.id;
+}
+async function readFileData(f) {
+  if (f.dataUrl) return f.dataUrl;
+  const parts = await Promise.all((f.bins || []).map(async id => { const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, { headers: { "X-Master-Key": MASTER_KEY } }); if (!r.ok) throw new Error("read"); return (await r.json()).record.c; }));
+  return parts.join("");
+}
+function deleteBins(f) { (f.bins || []).forEach(id => fetch(`https://api.jsonbin.io/v3/b/${id}`, { method: "DELETE", headers: { "X-Master-Key": MASTER_KEY } }).catch(() => {})); }
+
 /* upload */
 const fi = $("fileInput");
 fi.addEventListener("change", () => { $("dropName").innerText = fi.files[0] ? fi.files[0].name : "اسحب الملف هنا أو اضغط للاختيار"; });
@@ -624,21 +638,26 @@ async function handleUploadFile() {
   const subject = $("subjectSelect").value, btn = $("uploadBtn");
   if (!fi.files.length) return toast("اختار ملف الأول.", "err");
   const file = fi.files[0];
-  if (file.size > 700 * 1024) return toast("الملف كبير. الحد الأقصى 700KB.", "err");
+  if (file.size > MAX_FILE) return toast("الملف كبير. الحد الأقصى 4MB.", "err");
   setBusy(btn, true, "جاري الرفع..."); const pr = $("prog"); pr.style.display = "block"; pr.firstChild.style.width = "15%";
   const reader = new FileReader();
   reader.onprogress = e => { if (e.lengthComputable) pr.firstChild.style.width = 15 + 45 * e.loaded / e.total + "%"; };
   reader.onerror = () => { toast("تعذر قراءة الملف.", "err"); setBusy(btn, false, "رفع ومشاركة الملف"); pr.style.display = "none"; };
   reader.onload = async e => {
-    pr.firstChild.style.width = "70%";
-    const rec = { id: Date.now().toString(), name: file.name, type: file.type || "application/octet-stream", size: (file.size / 1024).toFixed(1) + " KB", subject, date: new Date().toLocaleDateString("ar-EG"), uploader: currentUserEmail, dataUrl: e.target.result };
-    await fetchServerData(); currentServerData.files.unshift(rec);
-    const ok = await updateServerData(currentServerData);
-    pr.firstChild.style.width = "100%";
+    const data = e.target.result, n = Math.ceil(data.length / CHUNK), bins = [], id = Date.now().toString();
+    try {
+      for (let i = 0; i < n; i++) {
+        bins.push(await createBin({ c: data.slice(i * CHUNK, (i + 1) * CHUNK) }, `sv-${id}-${i}`));
+        pr.firstChild.style.width = 20 + 70 * (i + 1) / n + "%";
+      }
+      const rec = { id, name: file.name, type: file.type || "application/octet-stream", size: file.size > 1048576 ? (file.size / 1048576).toFixed(2) + " MB" : (file.size / 1024).toFixed(1) + " KB", subject, date: new Date().toLocaleDateString("ar-EG"), uploader: currentUserEmail, bins };
+      await fetchServerData(); currentServerData.files.unshift(rec);
+      if (!(await updateServerData(currentServerData))) throw new Error("meta");
+      pr.firstChild.style.width = "100%"; toast("تم رفع ومشاركة الملف بنجاح!", "ok");
+      fi.value = ""; $("dropName").innerText = "اسحب الملف هنا أو اضغط للاختيار"; window._sig = null; syncWithServer();
+    } catch (err) { console.error(err); deleteBins({ bins }); toast("فشل الرفع. جرّب ملف أصغر أو حاول تاني.", "err"); }
     setTimeout(() => { pr.style.display = "none"; pr.firstChild.style.width = "0"; }, 500);
     setBusy(btn, false, "رفع ومشاركة الملف");
-    if (ok) { toast("تم رفع ومشاركة الملف بنجاح!", "ok"); fi.value = ""; $("dropName").innerText = "اسحب الملف هنا أو اضغط للاختيار"; window._sig = null; syncWithServer(); }
-    else toast("فشل الرفع. حاول مرة أخرى.", "err");
   };
   reader.readAsDataURL(file);
 }
@@ -660,22 +679,25 @@ function renderFileList(all) {
         ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')">${ic("trash")}</button>` : ""}</div></div>`;
   }).join("");
 }
-function openFile(id) {
+async function openFile(id) {
   const file = (window.cachedFiles || []).find(f => f.id == id); if (!file) return;
-  if (file.type.startsWith("image/") || file.type === "application/pdf") {
-    const win = window.open(); if (!win) return toast("اسمح بالنوافذ المنبثقة لفتح الملف.", "err");
-    win.document.write(`<title>${esc(file.name)}</title><body style="margin:0;background:#f8fafc"><iframe src="${file.dataUrl}" style="border:none;width:100vw;height:100vh"></iframe></body>`);
-  } else { const a = document.createElement("a"); a.href = file.dataUrl; a.download = file.name; a.click(); }
+  const img = file.type.startsWith("image/") || file.type === "application/pdf";
+  const win = img ? window.open("", "_blank") : null;
+  if (img && !win) return toast("اسمح بالنوافذ المنبثقة لفتح الملف.", "err");
+  toast("جاري تحميل الملف...");
+  let url; try { url = await readFileData(file); } catch (e) { if (win) win.close(); return toast("تعذر تحميل الملف.", "err"); }
+  if (img) { const b = await (await fetch(url)).blob(); win.location = URL.createObjectURL(b); }
+  else { const a = document.createElement("a"); a.href = url; a.download = file.name; a.click(); }
 }
 async function deleteServerFile(id) {
   if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
-  await fetchServerData(); currentServerData.files = currentServerData.files.filter(f => f.id != id);
+  await fetchServerData(); deleteBins(currentServerData.files.find(f => f.id == id) || {}); currentServerData.files = currentServerData.files.filter(f => f.id != id);
   if (await updateServerData(currentServerData)) toast("تم حذف الملف.", "ok"); else toast("فشل الحذف.", "err");
   window._sig = null; syncWithServer();
 }
 async function clearAllServerFiles() {
   if (!confirm("تحذير: مسح جميع الملفات من السيرفر نهائياً؟")) return;
-  await fetchServerData(); currentServerData.files = [];
+  await fetchServerData(); currentServerData.files.forEach(deleteBins); currentServerData.files = [];
   if (await updateServerData(currentServerData)) toast("تم مسح كافة الملفات.", "ok"); else toast("فشل المسح.", "err");
   window._sig = null; syncWithServer();
 }
