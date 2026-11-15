@@ -634,10 +634,29 @@ async function createBin(payload, name) {
   if (!r.ok) throw new Error("bin " + r.status);
   return (await r.json()).metadata.id;
 }
+async function readBin(id, tries = 4) {
+  let last = "";
+  for (let k = 0; k < tries; k++) {
+    try {
+      const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+      if (r.ok) return (await r.json()).record.c;
+      last = "HTTP " + r.status;
+    } catch (e) { last = "network"; }
+    await new Promise(res => setTimeout(res, 700 * (k + 1)));
+  }
+  throw new Error(last);
+}
 async function readFileData(f) {
   if (f.dataUrl) return f.dataUrl;
-  const parts = await Promise.all((f.bins || []).map(async id => { const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, { headers: { "X-Master-Key": MASTER_KEY } }); if (!r.ok) throw new Error("read"); return (await r.json()).record.c; }));
-  return parts.join("");
+  const ids = f.bins || [], out = new Array(ids.length); let next = 0;
+  await Promise.all([0, 1, 2].map(async () => { while (next < ids.length) { const i = next++; out[i] = await readBin(ids[i]); } }));
+  return out.join("");
+}
+function dataUrlToBlob(u) {
+  const m = u.match(/^data:([^;,]*)(;base64)?,(.*)$/s); if (!m) throw new Error("bad data");
+  const bin = m[2] ? atob(m[3]) : decodeURIComponent(m[3]), arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: m[1] || "application/octet-stream" });
 }
 function deleteBins(f) { (f.bins || []).forEach(id => fetch(`https://api.jsonbin.io/v3/b/${id}`, { method: "DELETE", headers: { "X-Master-Key": MASTER_KEY } }).catch(() => {})); }
 
@@ -714,13 +733,19 @@ function renderFileList(all) {
 }
 async function openFile(id) {
   const file = (window.cachedFiles || []).find(f => f.id == id); if (!file) return;
-  const img = file.type.startsWith("image/") || file.type === "application/pdf";
-  const win = img ? window.open("", "_blank") : null;
-  if (img && !win) return toast("اسمح بالنوافذ المنبثقة لفتح الملف.", "err");
+  const viewable = file.type.startsWith("image/") || file.type === "application/pdf";
+  const win = viewable ? window.open("", "_blank") : null;
+  if (win) win.document.write('<body style="font-family:sans-serif;display:grid;place-items:center;height:100vh;margin:0">جاري تحميل الملف...</body>');
   toast("جاري تحميل الملف...");
-  let url; try { url = await readFileData(file); } catch (e) { if (win) win.close(); return toast("تعذر تحميل الملف.", "err"); }
-  if (img) { const b = await (await fetch(url)).blob(); win.location = URL.createObjectURL(b); }
-  else { const a = document.createElement("a"); a.href = url; a.download = file.name; a.click(); }
+  try {
+    const blob = dataUrlToBlob(await readFileData(file)), url = URL.createObjectURL(blob);
+    if (win && !win.closed) win.location.href = url;
+    else { const a = document.createElement("a"); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  } catch (e) {
+    console.error(e); if (win) win.close();
+    toast("تعذر فتح الملف (" + (e.message || "خطأ") + "). لو الملف اترفع بنسخة قديمة جرّب ترفعه تاني.", "err");
+  }
 }
 async function deleteServerFile(id) {
   if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
