@@ -343,7 +343,7 @@ let currentServerData = { users: [], files: [] };
 const $ = id => document.getElementById(id);
 const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const COOWNERS = ["iamgoininsaaaane@gmail.com"]; // co-owners: same powers except clearing all files / banning staff
+const COOWNERS = ["iamgoininsaaaane@gmail.com", "mandogameing9@gmail.com"]; // co-owners: same powers except clearing all files / banning staff
 const isOwnerEmail = e => e === OWNER_EMAIL.toLowerCase();
 const isCoOwner = e => COOWNERS.map(x => x.toLowerCase()).includes((e || "").toLowerCase());
 const isStaff = e => isOwnerEmail(e) || isCoOwner(e);
