@@ -343,7 +343,7 @@ let currentServerData = { users: [], files: [] };
 const $ = id => document.getElementById(id);
 const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const COOWNERS = ["iamgoininsaaaane@gmail.com", "mandogameing9@gmail.com"]; // co-owners: same powers except clearing all files / banning staff
+const COOWNERS = ["iamgoininsaaaane@gmail.com", "mandogameing9@gmail.com"]; // co-owners: same powers as the owner (the main owner itself can never be banned)
 const isOwnerEmail = e => e === OWNER_EMAIL.toLowerCase();
 const isCoOwner = e => COOWNERS.map(x => x.toLowerCase()).includes((e || "").toLowerCase());
 const isStaff = e => isOwnerEmail(e) || isCoOwner(e);
@@ -607,7 +607,7 @@ function enterDashboard(email, silent) {
   const owner = isOwnerEmail(email), staff = isStaff(email);
   $("ownerBadgeContainer").innerHTML = owner ? `<span class="owner-tag">${ic("crown")} المالك الرئيسي</span>` : (staff ? `<span class="owner-tag">${ic("crown")} Co-Owner</span>` : "");
   $("ownerSection").classList.toggle("hidden", !staff);
-  $("clearBtn").classList.toggle("hidden", !owner);
+  $("clearBtn").classList.toggle("hidden", !staff);
   buildTabs(); $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   show("step-dashboard");
   if (silent) toast("أهلاً بيك تاني " + email.split("@")[0], "ok");
@@ -682,8 +682,8 @@ function renderUsers() {
   $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.email)}</strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><div class="fa">${u.banned ? `<span class="badge" style="background:rgba(225,29,72,.12);color:var(--err)">محظور</span>` : ""}${canBan(u.email) ? `<button class="btn-sm ${u.banned ? "" : "danger"}" onclick="banUser('${esc(u.email)}', ${!u.banned})">${u.banned ? "إلغاء الحظر" : "حظر"}</button>` : (isStaff(u.email) ? `<span class="badge">${isOwnerEmail(u.email) ? "Owner" : "Co-Owner"}</span>` : "")}</div></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
 }
 function canBan(email) {
-  if (!isStaff(currentUserEmail) || isStaff(email) || email === currentUserEmail) return false;
-  return true; // owner and co-owners can ban normal members only
+  if (!isStaff(currentUserEmail) || isOwnerEmail(email) || email === currentUserEmail) return false;
+  return true; // owner & co-owners can ban anyone except the main owner and themselves
 }
 async function banUser(email, flag) {
   if (!canBan(email)) return toast("مش مسموح تحظر الحساب ده.", "err");
