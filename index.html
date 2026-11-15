@@ -279,7 +279,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 
     <div id="ownerSection" class="owner hidden">
       <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
-        <button class="btn-sm danger" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
+        <button class="btn-sm danger" id="clearBtn" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
       <div class="agent-actions" style="margin-top:12px"><button class="btn-sm" style="flex:1;justify-content:center" onclick="toggleUsers()"><svg class="i"><use href="#i-users"/></svg><span id="usersBtnTxt">عرض المستخدمين وإيميلاتهم</span></button><button class="btn-sm" onclick="copyEmails()"><svg class="i"><use href="#i-mail"/></svg>نسخ كل الإيميلات</button></div>
       <div id="usersBox" class="hidden" style="margin-top:12px"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="userSearch" placeholder="ابحث بالإيميل..." oninput="renderUsers()"></div><div id="usersList" style="margin-top:8px;max-height:320px;overflow:auto"></div></div>
       <div class="stats">
@@ -343,7 +343,11 @@ let currentServerData = { users: [], files: [] };
 const $ = id => document.getElementById(id);
 const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const COOWNERS = ["iamgoininsaaaane@gmail.com"]; // co-owners: same powers except clearing all files / banning staff
 const isOwnerEmail = e => e === OWNER_EMAIL.toLowerCase();
+const isCoOwner = e => COOWNERS.map(x => x.toLowerCase()).includes((e || "").toLowerCase());
+const isStaff = e => isOwnerEmail(e) || isCoOwner(e);
+const isBanned = e => { const u = (currentServerData.users || []).find(x => x.email === e); return !!(u && u.banned); };
 
 /* ---------- toasts ---------- */
 function toast(msg, type = "info") {
@@ -447,6 +451,7 @@ async function handleAuthSubmit(e) {
     if (user) { toast("الحساب ده مسجل بالفعل. انتقل لتسجيل الدخول.", "err"); reset(); return switchAuthTab("login"); }
   } else {
     if (!user) { toast("الحساب ده غير مسجل. أنشئ حساب جديد.", "err"); reset(); return switchAuthTab("register"); }
+    if (user.banned) { toast("هذا الحساب محظور.", "err"); return reset(); }
     if (!(await passOk(user, pass))) { toast("كلمة المرور غير صحيحة.", "err"); return reset(); }
     // known device -> no code needed
     const tok = getSession(email);
@@ -536,6 +541,7 @@ async function handleVerifyOTP() {
   await fetchServerData();
   const token = rand(24);
   let user = currentServerData.users.find(u => u.email === email);
+  if (user && user.banned) { toast("هذا الحساب محظور.", "err"); return setBusy(btn, false, "تحقق والدخول"); }
   if (flow === "reset") {
     if (!user) { toast("الحساب غير موجود.", "err"); return setBusy(btn, false, "تغيير كلمة المرور والدخول"); }
     user.password = await hashPass($("newPass").value); user.devices = [token];
@@ -565,6 +571,7 @@ async function handleForgot(e) {
   const done = () => setBusy(btn, false, "إرسال كود الاسترجاع");
   if (!data) { toast("تعذر الاتصال بالسيرفر.", "err"); return done(); }
   if (!data.users.some(u => u.email === email)) { toast("مفيش حساب بالإيميل ده.", "err"); return done(); }
+  if (data.users.find(u => u.email === email).banned) { toast("هذا الحساب محظور.", "err"); return done(); }
   pending = { email, mode: "reset" }; flow = "reset";
   setBusy(btn, true, "جاري إرسال الكود...");
   const sent = await sendOTP(email); done();
@@ -582,7 +589,7 @@ async function autoLogin() {
   const data = await fetchServerData();
   if (!data) { toast("مفيش اتصال بالسيرفر حالياً.", "err"); return false; }
   const u = data.users.find(x => x.email === s.email);
-  if (u && (u.devices || []).includes(s.token)) { enterDashboard(s.email, true); return true; }
+  if (u && !u.banned && (u.devices || []).includes(s.token)) { enterDashboard(s.email, true); return true; }
   return false;
 }
 function logout() {
@@ -597,9 +604,10 @@ function logout() {
 function enterDashboard(email, silent) {
   currentUserEmail = email; saveLast(email);
   $("userBadge").innerText = email; $("avatar").innerText = email[0] || "S";
-  const owner = isOwnerEmail(email);
-  $("ownerBadgeContainer").innerHTML = owner ? `<span class="owner-tag">${ic("crown")} المالك الرئيسي</span>` : "";
-  $("ownerSection").classList.toggle("hidden", !owner);
+  const owner = isOwnerEmail(email), staff = isStaff(email);
+  $("ownerBadgeContainer").innerHTML = owner ? `<span class="owner-tag">${ic("crown")} المالك الرئيسي</span>` : (staff ? `<span class="owner-tag">${ic("crown")} Co-Owner</span>` : "");
+  $("ownerSection").classList.toggle("hidden", !staff);
+  $("clearBtn").classList.toggle("hidden", !owner);
   buildTabs(); $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   show("step-dashboard");
   if (silent) toast("أهلاً بيك تاني " + email.split("@")[0], "ok");
@@ -625,7 +633,7 @@ async function syncWithServer() {
   const sig = d.files.map(f => f.id).join(",");
   window.cachedFiles = d.files;
   if (sig !== window._sig) { window._sig = sig; window._fresh = true; }
-  buildTabs(); renderFileList(d.files); if (isOwnerEmail(currentUserEmail) && !$("usersBox").classList.contains("hidden")) renderUsers();
+  buildTabs(); renderFileList(d.files); if (isBanned(currentUserEmail)) { logout(); toast("تم حظر هذا الحساب.", "err"); return; } if (isStaff(currentUserEmail) && !$("usersBox").classList.contains("hidden")) renderUsers();
 }
 
 /* chunked file storage: each chunk lives in its own bin so size isn't limited by one bin */
@@ -662,19 +670,31 @@ function deleteBins(f) { (f.bins || []).forEach(id => fetch(`https://api.jsonbin
 
 /* owner: users list */
 function toggleUsers() {
-  if (!isOwnerEmail(currentUserEmail)) return;
+  if (!isStaff(currentUserEmail)) return;
   const b = $("usersBox"), open = b.classList.toggle("hidden") === false;
   $("usersBtnTxt").innerText = open ? "إخفاء المستخدمين" : "عرض المستخدمين وإيميلاتهم";
   if (open) renderUsers();
 }
 function renderUsers() {
-  if (!isOwnerEmail(currentUserEmail)) return;
+  if (!isStaff(currentUserEmail)) return;
   const q = ($("userSearch").value || "").trim().toLowerCase(), us = (currentServerData.users || []).filter(u => u.email.toLowerCase().includes(q));
   const fc = {}; (currentServerData.files || []).forEach(f => fc[f.uploader] = (fc[f.uploader] || 0) + 1);
-  $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.email)}</strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><span class="badge">#${i + 1}</span></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
+  $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.email)}</strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><div class="fa">${u.banned ? `<span class="badge" style="background:rgba(225,29,72,.12);color:var(--err)">محظور</span>` : ""}${canBan(u.email) ? `<button class="btn-sm ${u.banned ? "" : "danger"}" onclick="banUser('${esc(u.email)}', ${!u.banned})">${u.banned ? "إلغاء الحظر" : "حظر"}</button>` : (isStaff(u.email) ? `<span class="badge">${isOwnerEmail(u.email) ? "Owner" : "Co-Owner"}</span>` : "")}</div></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
+}
+function canBan(email) {
+  if (!isStaff(currentUserEmail) || isStaff(email) || email === currentUserEmail) return false;
+  return true; // owner and co-owners can ban normal members only
+}
+async function banUser(email, flag) {
+  if (!canBan(email)) return toast("مش مسموح تحظر الحساب ده.", "err");
+  if (flag && !confirm("حظر " + email + " ؟ مش هيقدر يدخل الموقع.")) return;
+  await fetchServerData();
+  const u = currentServerData.users.find(x => x.email === email); if (!u) return toast("المستخدم غير موجود.", "err");
+  u.banned = flag; if (flag) u.devices = [];
+  if (await updateServerData(currentServerData)) { toast(flag ? "تم حظر " + email : "تم إلغاء حظر " + email, "ok"); renderUsers(); } else toast("فشل التحديث.", "err");
 }
 function copyEmails() {
-  if (!isOwnerEmail(currentUserEmail)) return;
+  if (!isStaff(currentUserEmail)) return;
   const t = (currentServerData.users || []).map(u => u.email).join("\n");
   (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("تم نسخ " + (currentServerData.users || []).length + " إيميل.", "ok")).catch(() => toast("تعذر النسخ.", "err"));
 }
@@ -716,7 +736,7 @@ async function handleUploadFile() {
 
 function fileIcon(f) { return (f.type || "").startsWith("image/") ? "img" : "file"; }
 function renderFileList(all) {
-  const box = $("filesList"), owner = isOwnerEmail(currentUserEmail), q = ($("searchInput").value || "").trim().toLowerCase();
+  const box = $("filesList"), owner = isStaff(currentUserEmail), q = ($("searchInput").value || "").trim().toLowerCase();
   let files = all; if (currentFilter !== "All") files = files.filter(f => f.subject === currentFilter);
   if (q) files = files.filter(f => (f.name || "").toLowerCase().includes(q));
   if (!files.length) { box.innerHTML = `<div class="empty">${ic("folder")}لا توجد ملفات في هذا القسم حالياً.</div>`; return; }
