@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4f46e5">
+<title>STEM Vault - بوابة ملفات STEM والـ AI Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#ffffffd9;--card-solid:#fff;--border:#e4e8f0;--text:#0f172a;--muted:#64748b;
+  --primary:#4f46e5;--primary2:#7c3aed;--primary-hover:#4338ca;--primary-light:#eef2ff;
+  --input:#f1f4f9;--shadow:0 10px 40px -12px rgba(30,41,90,.18);--shadow-sm:0 2px 8px rgba(15,23,42,.06);
+  --owner:#d97706;--owner-bg:#fffbeb;--agent-bg:#f5f3ff;--agent-border:#ddd6fe;--agent-text:#6d28d9;
+  --ok:#059669;--err:#e11d48;--blob1:#c7d2fe;--blob2:#e9d5ff;--blob3:#bae6fd;
+}
+body.dark{
+  --bg:#080b14;--card:#10162799;--card-solid:#111827;--border:#222c42;--text:#f1f5f9;--muted:#94a3b8;
+  --primary:#818cf8;--primary2:#a78bfa;--primary-hover:#6366f1;--primary-light:rgba(129,140,248,.14);
+  --input:#0b1020;--shadow:0 20px 50px -15px rgba(0,0,0,.7);--shadow-sm:0 2px 10px rgba(0,0,0,.4);
+  --owner:#fbbf24;--owner-bg:rgba(245,158,11,.1);--agent-bg:rgba(124,58,237,.12);--agent-border:rgba(167,139,250,.3);--agent-text:#c4b5fd;
+  --ok:#34d399;--err:#fb7185;--blob1:#312e81;--blob2:#581c87;--blob3:#0c4a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  display:flex;justify-content:center;align-items:flex-start;padding:28px 16px 60px;overflow-x:hidden;transition:background .3s,color .3s}
+svg.i{width:1.15em;height:1.15em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.2em}
+/* animated background */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;animation:float 18s ease-in-out infinite}
+.b1{width:420px;height:420px;background:var(--blob1);top:-120px;right:-100px}
+.b2{width:380px;height:380px;background:var(--blob2);bottom:-120px;left:-80px;animation-delay:-6s}
+.b3{width:300px;height:300px;background:var(--blob3);top:45%;left:40%;animation-delay:-11s;opacity:.5}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-30px,40px) scale(.95)}}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.35;mask-image:radial-gradient(circle at 50% 30%,#000,transparent 70%);-webkit-mask-image:radial-gradient(circle at 50% 30%,#000,transparent 70%)}
+/* top bar */
+.theme-btn{position:fixed;top:16px;left:16px;z-index:50;display:flex;align-items:center;gap:8px;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:99px;cursor:pointer;font:600 13px 'Tajawal',sans-serif;box-shadow:var(--shadow-sm);transition:transform .2s}
+.theme-btn:hover{transform:translateY(-2px)}
+.theme-btn svg{transition:transform .5s}.theme-btn:hover svg{transform:rotate(25deg) scale(1.1)}
+.wrap{width:100%;display:flex;justify-content:center;margin-top:48px}
+.card{background:var(--card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:24px;padding:34px;width:100%;max-width:520px;box-shadow:var(--shadow);position:relative}
+.card.wide{max-width:760px}
+.view{animation:rise .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+.logo{width:64px;height:64px;border-radius:20px;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:grid;place-items:center;color:#fff;box-shadow:0 12px 30px -8px var(--primary);animation:pop .8s cubic-bezier(.3,1.6,.5,1) both,glow 3s ease-in-out infinite 1s}
+.logo svg{width:32px;height:32px}
+@keyframes pop{from{transform:scale(0) rotate(-30deg)}to{transform:none}}
+@keyframes glow{0%,100%{box-shadow:0 12px 30px -8px var(--primary)}50%{box-shadow:0 12px 44px -4px var(--primary2)}}
+h2,h3{font-weight:800;text-align:center}
+h2{font-size:26px;margin-bottom:4px}
+.brand{background:linear-gradient(90deg,var(--primary),var(--primary2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:14px;text-align:center;margin-bottom:20px;line-height:1.6}
+.status{display:flex;width:fit-content;margin:0 auto 18px;align-items:center;gap:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--ok);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:#10b981;position:relative}
+.dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:#10b981;animation:ping 1.8s infinite}
+@keyframes ping{to{transform:scale(3);opacity:0}}
+.seg{display:flex;background:var(--input);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:18px;position:relative}
+.seg button{flex:1;padding:10px;border:none;background:none;color:var(--muted);font:700 13px 'Tajawal',sans-serif;border-radius:10px;cursor:pointer;position:relative;z-index:1;transition:color .25s}
+.seg button.on{color:var(--primary)}
+.seg .pill{position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);background:var(--card-solid);border-radius:10px;box-shadow:var(--shadow-sm);transition:transform .35s cubic-bezier(.3,1.3,.5,1);inset-inline-start:4px}
+.seg.l .pill{transform:translateX(-100%)}
+label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:700}
+.field{position:relative}
+.field>svg.i{position:absolute;top:50%;inset-inline-start:14px;transform:translateY(-50%);color:var(--muted);transition:color .2s;pointer-events:none}
+.field input{padding-inline-start:42px}
+.field:focus-within>svg.i{color:var(--primary)}
+.eye{position:absolute;top:50%;inset-inline-end:8px;transform:translateY(-50%);width:34px!important;height:34px!important;padding:0!important;background:none!important;border:none!important;color:var(--muted);cursor:pointer;display:grid;place-items:center;margin:0!important}
+input,select{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--input);color:var(--text);font:500 14px 'Tajawal',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light)}
+.btn{width:100%;margin-top:18px;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font:800 15px 'Tajawal',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 22px -8px var(--primary)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -8px var(--primary)}
+.btn:active{transform:scale(.98)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(120%);transition:transform .6s}
+.btn:hover::after{transform:translateX(-120%)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn.ghost{background:none;color:var(--muted);box-shadow:none;margin-top:8px;font-weight:700;font-size:13px}
+.btn.ghost::after{display:none}.btn.ghost:hover{color:var(--primary);box-shadow:none;transform:none}
+.link{background:none;border:none;color:var(--primary);font:700 13px 'Tajawal',sans-serif;cursor:pointer;padding:4px 0}
+.link:hover{text-decoration:underline}
+.link:disabled{color:var(--muted);text-decoration:none;cursor:default}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+/* otp */
+.otp{display:flex;gap:10px;justify-content:center;direction:ltr;margin:6px 0}
+.otp input{width:100%;max-width:54px;height:62px;padding:0;text-align:center;font-size:26px;font-weight:800;border-radius:14px}
+.otp input.filled{border-color:var(--primary);background:var(--primary-light)}
+.otp.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.mailico{width:72px;height:72px;border-radius:50%;margin:0 auto 14px;background:var(--primary-light);color:var(--primary);display:grid;place-items:center;animation:bob 2.5s ease-in-out infinite}
+.mailico svg{width:34px;height:34px}
+@keyframes bob{50%{transform:translateY(-6px)}}
+/* toasts */
+#toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;z-index:999;width:min(92vw,420px)}
+.toast{display:flex;gap:10px;align-items:center;background:var(--card-solid);border:1px solid var(--border);border-inline-start:4px solid var(--primary);padding:12px 16px;border-radius:14px;box-shadow:var(--shadow);font-weight:700;font-size:14px;animation:tin .4s cubic-bezier(.3,1.4,.5,1) both}
+.toast.ok{border-inline-start-color:var(--ok)}.toast.ok svg{color:var(--ok)}
+.toast.err{border-inline-start-color:var(--err)}.toast.err svg{color:var(--err)}
+.toast.out{animation:tout .3s forwards}
+@keyframes tin{from{opacity:0;transform:translateY(30px) scale(.9)}}
+@keyframes tout{to{opacity:0;transform:translateY(20px) scale(.9)}}
+/* dashboard */
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.who{display:flex;gap:12px;align-items:center}
+.avatar{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;text-transform:uppercase}
+.who h3{text-align:start;font-size:19px;margin:0}
+.who small{color:var(--muted);font-size:12px;word-break:break-all}
+.owner-tag{display:inline-flex;gap:4px;align-items:center;color:var(--owner);font-weight:800;font-size:11px}
+.btn-sm{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input);color:var(--text);font:700 12px 'Tajawal',sans-serif;cursor:pointer;transition:all .2s}
+.btn-sm:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary);transform:translateY(-1px)}
+.btn-sm.danger{color:var(--err)}.btn-sm.danger:hover{background:rgba(225,29,72,.1);border-color:var(--err);color:var(--err)}
+.owner{background:var(--owner-bg);border:1px solid rgba(217,119,6,.3);padding:16px;border-radius:18px;margin-top:20px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.stat{background:var(--card-solid);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center;transition:transform .25s}
+.stat:hover{transform:translateY(-3px)}
+.stat .ic{width:42px;height:42px;border-radius:12px;background:var(--owner-bg);color:var(--owner);display:grid;place-items:center}
+.stat b{font-size:24px;display:block;line-height:1;color:var(--owner)}.stat span{font-size:12px;color:var(--muted)}
+.agent{background:var(--agent-bg);border:1px solid var(--agent-border);border-radius:18px;padding:16px;margin-top:20px;position:relative;overflow:hidden}
+.agent::before{content:"";position:absolute;inset:-2px;background:conic-gradient(from 0deg,transparent,var(--primary2),transparent 30%);opacity:.18;animation:rot 6s linear infinite;pointer-events:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+.agent>*{position:relative}
+.agent-title{display:flex;gap:8px;align-items:center;font-weight:800;color:var(--agent-text);font-size:15px}
+.live{font-size:11px;background:var(--agent-border);color:var(--agent-text);padding:2px 10px;border-radius:99px;font-weight:800}
+.agent p{font-size:12.5px;color:var(--muted);line-height:1.7;margin:10px 0 12px}
+.agent-actions{display:flex;gap:8px;flex-wrap:wrap}
+.agent-actions .btn-sm{flex:1;justify-content:center;background:var(--card-solid);border-color:var(--agent-border);color:var(--agent-text)}
+.agent-res{display:none;margin-top:12px;padding:12px;background:var(--card-solid);border:1px solid var(--agent-border);border-radius:12px;font-size:13px;line-height:1.9;animation:rise .4s both}
+.agent-res .bar{height:8px;border-radius:9px;background:var(--input);overflow:hidden;display:inline-block;width:110px;vertical-align:middle;margin-inline-start:8px}
+.agent-res .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));width:0;animation:fill 1s .2s forwards}
+@keyframes fill{to{width:var(--w)}}
+.upload{margin-top:22px;padding-top:6px;border-top:1px solid var(--border)}
+.drop{margin-top:8px;border:2px dashed var(--border);border-radius:16px;padding:24px 12px;text-align:center;color:var(--muted);cursor:pointer;transition:all .25s;background:var(--input)}
+.drop:hover,.drop.over{border-color:var(--primary);background:var(--primary-light);color:var(--primary);transform:scale(1.01)}
+.drop svg{width:34px;height:34px;display:block;margin:0 auto 8px;animation:bob 2.5s ease-in-out infinite}
+.drop b{display:block;color:var(--text);font-size:14px;word-break:break-all}.drop small{font-size:12px}
+.prog{height:6px;background:var(--input);border-radius:9px;margin-top:12px;overflow:hidden;display:none}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:width .3s}
+.tools{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.search{flex:1;min-width:160px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 6px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:inline-flex;gap:6px;align-items:center;white-space:nowrap;padding:8px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--card-solid);color:var(--muted);font:700 12.5px 'Tajawal',sans-serif;cursor:pointer;transition:all .25s}
+.tab:hover{transform:translateY(-2px);color:var(--text)}
+.tab.on{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-color:transparent;box-shadow:0 8px 18px -8px var(--primary)}
+.tab em{font-style:normal;font-size:11px;background:rgba(127,127,127,.18);padding:0 7px;border-radius:99px}
+.file{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card-solid);border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:10px;animation:rise .5s both;transition:transform .25s,box-shadow .25s;flex-wrap:wrap}
+.file:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm)}
+.fi{display:flex;gap:12px;align-items:center;min-width:0;flex:1}
+.fic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex:none;color:#fff}
+.fi strong{display:block;font-size:14px;word-break:break-all}
+.meta{font-size:11.5px;color:var(--muted);margin-top:3px;word-break:break-all}
+.fa{display:flex;gap:8px;align-items:center}
+.badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--primary-light);color:var(--primary)}
+.empty{text-align:center;color:var(--muted);padding:36px 10px;font-size:14px}
+.empty svg{width:46px;height:46px;display:block;margin:0 auto 10px;opacity:.5}
+.skel{height:72px;border-radius:16px;margin-top:10px;background:linear-gradient(90deg,var(--input) 25%,var(--border) 50%,var(--input) 75%);background-size:200% 100%;animation:sh 1.3s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.splash{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:200;transition:opacity .4s}
+.splash .logo{animation:pop .8s both,glow 2s infinite}
+@media(max-width:520px){.card{padding:24px 18px;border-radius:20px}.otp input{height:54px;font-size:22px}.otp{gap:6px}.theme-btn span{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6C3.8 8.3 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+<symbol id="i-open" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="4"/><path d="M12 8V4M9 14h.01M15 14h.01M2 13v2M22 13v2"/><circle cx="12" cy="3.5" r="1"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="m3 7 4.5 4L12 4l4.5 7L21 7l-2 12H5z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4.2a4 4 0 0 1 0 7.6M22 21a7 7 0 0 0-4-6.3"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></symbol>
+<symbol id="i-bio" viewBox="0 0 24 24"><path d="M5 3c0 6 14 6 14 12M5 21c0-6 14-6 14-12M8 6h8M8 18h8M7 12h10"/></symbol>
+<symbol id="i-geo" viewBox="0 0 24 24"><path d="m3 20 6-11 4 6 3-4 5 9z"/><circle cx="17" cy="6" r="2"/></symbol>
+<symbol id="i-lang" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+<symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+<symbol id="i-math" viewBox="0 0 24 24"><path d="M18 5H7l6 7-6 7h11"/></symbol>
+<symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2M18 2v4h-4M6 22v-4h4"/></symbol>
+</defs></svg>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid-bg"></div></div>
+
+<button class="theme-btn" onclick="toggleTheme()" aria-label="تبديل الوضع"><svg class="i" id="themeIcon"><use href="#i-moon"/></svg><span id="themeText">الوضع الليلي</span></button>
+<div id="toasts"></div>
+<div class="splash" id="splash"><div class="logo"><svg class="i"><use href="#i-atom"/></svg></div></div>
+
+<div class="wrap">
+  <!-- 1: auth -->
+  <div id="step-auth" class="card view hidden">
+    <div class="logo"><svg class="i"><use href="#i-atom"/></svg></div>
+    <h2 class="brand">STEM Vault</h2>
+    <p class="sub" id="authSubtitle">المنصة المنظمة لمصادر وماتيريالز STEM</p>
+    <div class="status"><span class="dot"></span>متصل بالسيرفر السحابي المباشر</div>
+    <div class="seg r" id="seg"><span class="pill"></span>
+      <button id="tabRegister" class="on" type="button" onclick="switchAuthTab('register')">إنشاء حساب جديد</button>
+      <button id="tabLogin" type="button" onclick="switchAuthTab('login')">تسجيل دخول</button>
+    </div>
+    <form onsubmit="handleAuthSubmit(event)">
+      <label for="userEmail">البريد الإلكتروني</label>
+      <div class="field"><svg class="i"><use href="#i-mail"/></svg><input type="email" id="userEmail" placeholder="student@example.com" required autocomplete="email"></div>
+      <label for="userPassword">كلمة المرور</label>
+      <div class="field"><svg class="i"><use href="#i-lock"/></svg><input type="password" id="userPassword" placeholder="••••••••" required minlength="6" autocomplete="current-password"><button type="button" class="eye" onclick="togglePass('userPassword',this)" aria-label="إظهار"><svg class="i"><use href="#i-eye"/></svg></button></div>
+      <div id="forgotRow" class="hidden" style="margin-top:8px"><button type="button" class="link" onclick="openForgot()">نسيت كلمة المرور؟</button></div>
+      <button class="btn" id="authBtn" type="submit"><span>إنشاء الحساب واستلام كود التأكيد</span></button>
+    </form>
+  </div>
+
+  <!-- 2: forgot -->
+  <div id="step-forgot" class="card view hidden">
+    <div class="mailico"><svg class="i"><use href="#i-key"/></svg></div>
+    <h2>استرجاع الحساب</h2>
+    <p class="sub">اكتب بريدك المسجل وهنبعتلك كود لإعادة تعيين كلمة المرور</p>
+    <form onsubmit="handleForgot(event)">
+      <label for="forgotEmail">البريد الإلكتروني</label>
+      <div class="field"><svg class="i"><use href="#i-mail"/></svg><input type="email" id="forgotEmail" placeholder="student@example.com" required></div>
+      <button class="btn" id="forgotBtn" type="submit"><span>إرسال كود الاسترجاع</span></button>
+    </form>
+    <button class="btn ghost" type="button" onclick="backToAuth()"><svg class="i"><use href="#i-arrow"/></svg>رجوع لتسجيل الدخول</button>
+  </div>
+
+  <!-- 3: otp -->
+  <div id="step-otp" class="card view hidden">
+    <div class="mailico"><svg class="i"><use href="#i-mail"/></svg></div>
+    <h2 id="otpTitle">تأكيد الأمان</h2>
+    <p class="sub" id="otpNotice">تم إرسال كود التحقق إلى بريدك</p>
+    <label style="text-align:center">أدخل الكود المكوّن من 6 أرقام</label>
+    <div class="otp" id="otpBoxes"></div>
+    <div id="resetFields" class="hidden">
+      <label for="newPass">كلمة المرور الجديدة</label>
+      <div class="field"><svg class="i"><use href="#i-lock"/></svg><input type="password" id="newPass" minlength="6" placeholder="6 أحرف على الأقل" autocomplete="new-password"><button type="button" class="eye" onclick="togglePass('newPass',this)"><svg class="i"><use href="#i-eye"/></svg></button></div>
+    </div>
+    <button class="btn" id="otpBtn" onclick="handleVerifyOTP()"><span>تحقق والدخول</span></button>
+    <div class="row" style="margin-top:10px">
+      <button class="link" id="resendBtn" onclick="resendOTP()" disabled>إعادة إرسال الكود</button>
+      <button class="link" style="color:var(--muted)" onclick="backToAuth()">تعديل الإيميل</button>
+    </div>
+    <p class="sub" style="margin:14px 0 0;font-size:12px"><svg class="i"><use href="#i-shield"/></svg> الكود بيتطلب مرة واحدة بس، وبعدها الجهاز ده يفضل مسجّل.</p>
+  </div>
+
+  <!-- 4: dashboard -->
+  <div id="step-dashboard" class="card wide view hidden">
+    <div class="dhead">
+      <div class="who"><div class="avatar" id="avatar">S</div>
+        <div><h3>مستودع ماتيريالز STEM</h3><small id="userBadge"></small><div id="ownerBadgeContainer"></div></div></div>
+      <button class="btn-sm danger" onclick="logout()"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
+    </div>
+
+    <div id="ownerSection" class="owner hidden">
+      <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
+        <button class="btn-sm danger" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
+      <div class="stats">
+        <div class="stat"><div class="ic"><svg class="i"><use href="#i-users"/></svg></div><div><b id="statTotalUsers">0</b><span>إجمالي الطلاب المسجلين</span></div></div>
+        <div class="stat"><div class="ic"><svg class="i"><use href="#i-folder"/></svg></div><div><b id="statTotalFiles">0</b><span>إجمالي الملفات المشتركة</span></div></div>
+      </div>
+    </div>
+
+    <div class="agent">
+      <div class="row"><span class="agent-title"><svg class="i"><use href="#i-bot"/></svg>STEM Material AI Agent</span><span class="live">Active</span></div>
+      <p>الـ Agent بيفحص الملفات المرفوعة، بيرتبها حسب المادة، وبيكتشف الماتيريال الناقصة.</p>
+      <div class="agent-actions">
+        <button class="btn-sm" onclick="runAIAudit()"><svg class="i"><use href="#i-search"/></svg>تدقيق وتنظيم الملفات</button>
+        <button class="btn-sm" onclick="runAISuggestions()"><svg class="i"><use href="#i-bulb"/></svg>اقتراح مصادر ناقصة</button>
+      </div>
+      <div class="agent-res" id="agentResult"></div>
+    </div>
+
+    <div class="upload">
+      <label for="subjectSelect">المادة العلمية</label>
+      <select id="subjectSelect"></select>
+      <label>الملف</label>
+      <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
+        <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 700KB</small>
+      </div>
+      <input type="file" id="fileInput" class="hidden">
+      <div class="prog" id="prog"><i></i></div>
+      <button class="btn" id="uploadBtn" onclick="handleUploadFile()"><svg class="i"><use href="#i-upload"/></svg><span>رفع ومشاركة الملف</span></button>
+    </div>
+
+    <div class="tools"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="filesList"></div>
+  </div>
+</div>
+
+<script>
+const OWNER_EMAIL = "hobazeema900@gmail.com";
+const SERVICE_ID  = "service_nzthyi8";
+const TEMPLATE_ID = "template_rsook3v";
+const PUBLIC_KEY  = "1iW1iRr1jl5aiKV-5";
+const MASTER_KEY  = "$2a$10$3lNm.s53sLxRnK/TlpYvBuDXGe0G7/mKjJqPZCpndlJOKxJqc/Uo.";
+const BIN_ID      = "6adfa49cffd5d160538dc8ec";
+try{emailjs.init(PUBLIC_KEY);}catch(e){console.warn('emailjs not loaded');}
+
+const SUBJECTS = {
+  Biology:{ar:"الأحياء",icon:"bio",c:"#10b981"},
+  Geology:{ar:"الجيولوجيا",icon:"geo",c:"#f59e0b"},
+  English:{ar:"الإنجليزي",icon:"lang",c:"#3b82f6"},
+  Mechanics:{ar:"الميكانيكا",icon:"cog",c:"#ef4444"},
+  Math:{ar:"الرياضيات",icon:"math",c:"#8b5cf6"}
+};
+const OTP_TTL = 10 * 60 * 1000, MAX_TRIES = 5, MAX_DEVICES = 6, SESSION_KEY = "sv_session";
+
+let authMode = "register", flow = "register";
+let pending = null, otpState = null, resendTimer = null;
+let currentUserEmail = "", currentFilter = "All", pollId = null;
+let currentServerData = { users: [], files: [] };
+
+const $ = id => document.getElementById(id);
+const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isOwnerEmail = e => e === OWNER_EMAIL.toLowerCase();
+
+/* ---------- toasts ---------- */
+function toast(msg, type = "info") {
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.innerHTML = ic(type === "ok" ? "check" : type === "err" ? "alert" : "bulb") + `<span>${esc(msg)}</span>`;
+  $("toasts").appendChild(t);
+  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 3600);
+}
+/* ---------- theme ---------- */
+function applyTheme(dark) {
+  document.body.classList.toggle("dark", dark);
+  $("themeIcon").innerHTML = `<use href="#i-${dark ? "sun" : "moon"}"/>`;
+  $("themeText").innerText = dark ? "الوضع الفاتح" : "الوضع الليلي";
+}
+function toggleTheme() {
+  const d = !document.body.classList.contains("dark");
+  try { localStorage.setItem("stem_theme", d ? "dark" : "light"); } catch (e) {}
+  applyTheme(d);
+}
+(function () {
+  let s = null; try { s = localStorage.getItem("stem_theme"); } catch (e) {}
+  applyTheme(s ? s === "dark" : window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+})();
+
+/* ---------- views ---------- */
+function show(id) {
+  ["step-auth", "step-forgot", "step-otp", "step-dashboard"].forEach(v => $(v).classList.add("hidden"));
+  const el = $(id); el.classList.remove("hidden"); el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function setBusy(btn, busy, label) {
+  btn.disabled = busy;
+  btn.querySelector("span") && (btn.querySelector("span").innerText = label);
+  const sp = btn.querySelector(".spin");
+  if (busy && !sp) btn.insertAdjacentHTML("afterbegin", '<i class="spin"></i>');
+  if (!busy && sp) sp.remove();
+}
+function togglePass(id, btn) {
+  const i = $(id), show = i.type === "password"; i.type = show ? "text" : "password";
+  btn.innerHTML = ic(show ? "eyeoff" : "eye");
+}
+
+/* ---------- crypto helpers ---------- */
+async function hashPass(p) {
+  try {
+    if (!(window.crypto && crypto.subtle)) return p;
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("stemvault:" + p));
+    return "sha256:" + [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+  } catch (e) { return p; }
+}
+async function passOk(user, p) { return user.password === p || user.password === await hashPass(p); }
+function rand(n) { const a = new Uint8Array(n); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.random() * 256); return [...a].map(x => x.toString(16).padStart(2, "0")).join(""); }
+function otpCode() { const a = new Uint32Array(1); crypto.getRandomValues(a); return String(100000 + (a[0] % 900000)); }
+
+/* ---------- server ---------- */
+async function fetchServerData() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+    if (res.ok) {
+      const data = await res.json();
+      currentServerData = data.record || { users: [], files: [] };
+      if (!Array.isArray(currentServerData.users)) currentServerData.users = [];
+      if (!Array.isArray(currentServerData.files)) currentServerData.files = [];
+      return currentServerData;
+    }
+  } catch (err) { console.error("Fetch error:", err); }
+  return null;
+}
+async function updateServerData(d) {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(d) });
+    return res.ok;
+  } catch (err) { console.error("Update error:", err); return false; }
+}
+
+/* ---------- auth ---------- */
+function switchAuthTab(mode) {
+  authMode = mode;
+  $("tabRegister").classList.toggle("on", mode === "register");
+  $("tabLogin").classList.toggle("on", mode === "login");
+  $("seg").className = "seg " + (mode === "register" ? "r" : "l");
+  $("forgotRow").classList.toggle("hidden", mode !== "login");
+  $("authBtn").querySelector("span").innerText = mode === "register" ? "إنشاء الحساب واستلام كود التأكيد" : "دخول";
+  $("authSubtitle").innerText = mode === "register" ? "أنشئ حسابك وفعّله بكود يوصلك على الإيميل (مرة واحدة)" : "أهلاً بيك تاني! الجهاز المسجّل بيدخل لوحده";
+  $("userPassword").autocomplete = mode === "register" ? "new-password" : "current-password";
+}
+function openForgot() { $("forgotEmail").value = $("userEmail").value; show("step-forgot"); }
+function backToAuth() { clearInterval(resendTimer); show("step-auth"); }
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = $("userEmail").value.trim().toLowerCase(), pass = $("userPassword").value, btn = $("authBtn");
+  setBusy(btn, true, "جاري الفحص...");
+  const data = await fetchServerData();
+  if (!data) { toast("تعذر الاتصال بالسيرفر. جرّب تاني.", "err"); return setBusy(btn, false, authMode === "register" ? "إنشاء الحساب واستلام كود التأكيد" : "دخول"); }
+  const user = data.users.find(u => u.email === email);
+  const reset = () => setBusy(btn, false, authMode === "register" ? "إنشاء الحساب واستلام كود التأكيد" : "دخول");
+
+  if (authMode === "register") {
+    if (user) { toast("الحساب ده مسجل بالفعل. انتقل لتسجيل الدخول.", "err"); reset(); return switchAuthTab("login"); }
+  } else {
+    if (!user) { toast("الحساب ده غير مسجل. أنشئ حساب جديد.", "err"); reset(); return switchAuthTab("register"); }
+    if (!(await passOk(user, pass))) { toast("كلمة المرور غير صحيحة.", "err"); return reset(); }
+    // known device -> no code needed
+    const tok = getSession(email);
+    if (tok && (user.devices || []).includes(tok)) { reset(); return enterDashboard(email, true); }
+  }
+  pending = { email, password: pass, mode: authMode };
+  flow = authMode;
+  setBusy(btn, true, "جاري إرسال الكود...");
+  const sent = await sendOTP(email);
+  reset();
+  if (sent) openOtp(email);
+}
+
+async function sendOTP(email) {
+  otpState = { code: otpCode(), exp: Date.now() + OTP_TTL, tries: 0, email };
+  try {
+    await emailjs.send(SERVICE_ID, TEMPLATE_ID, { to_email: email, otp_code: otpState.code });
+    toast("تم إرسال كود التأكيد إلى " + email, "ok");
+    return true;
+  } catch (error) {
+    otpState = null;
+    toast("فشل الإرسال: " + (error.text || "حاول مرة أخرى"), "err");
+    return false;
+  }
+}
+
+/* otp boxes */
+function buildOtpBoxes() {
+  const w = $("otpBoxes"); w.innerHTML = "";
+  for (let i = 0; i < 6; i++) {
+    const inp = document.createElement("input");
+    inp.inputMode = "numeric"; inp.maxLength = 1; inp.autocomplete = i === 0 ? "one-time-code" : "off"; inp.setAttribute("aria-label", "رقم " + (i + 1));
+    inp.addEventListener("input", () => {
+      inp.value = inp.value.replace(/\D/g, "").slice(-1); inp.classList.toggle("filled", !!inp.value);
+      if (inp.value && w.children[i + 1]) w.children[i + 1].focus();
+      if (getOtp().length === 6 && flow !== "reset") handleVerifyOTP();
+    });
+    inp.addEventListener("keydown", e => { if (e.key === "Backspace" && !inp.value && w.children[i - 1]) { w.children[i - 1].focus(); } if (e.key === "Enter") handleVerifyOTP(); });
+    inp.addEventListener("paste", e => {
+      const t = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6); if (!t) return; e.preventDefault();
+      [...w.children].forEach((c, k) => { c.value = t[k] || ""; c.classList.toggle("filled", !!c.value); });
+      (w.children[Math.min(t.length, 5)]).focus();
+      if (t.length === 6 && flow !== "reset") handleVerifyOTP();
+    });
+    w.appendChild(inp);
+  }
+}
+const getOtp = () => [...$("otpBoxes").children].map(i => i.value).join("");
+function clearOtp() { [...$("otpBoxes").children].forEach(i => { i.value = ""; i.classList.remove("filled"); }); $("otpBoxes").children[0].focus(); }
+function openOtp(email) {
+  buildOtpBoxes();
+  const reset = flow === "reset";
+  $("otpTitle").innerText = reset ? "إعادة تعيين كلمة المرور" : "تأكيد الأمان";
+  $("otpNotice").innerText = "تم إرسال كود التحقق إلى " + email;
+  $("resetFields").classList.toggle("hidden", !reset);
+  $("newPass").value = "";
+  $("otpBtn").querySelector("span").innerText = reset ? "تغيير كلمة المرور والدخول" : "تحقق والدخول";
+  show("step-otp"); startResendTimer();
+  setTimeout(() => $("otpBoxes").children[0].focus(), 300);
+}
+function startResendTimer() {
+  clearInterval(resendTimer); let s = 30; const b = $("resendBtn"); b.disabled = true;
+  const tick = () => { b.innerText = s > 0 ? `إعادة الإرسال بعد ${s} ث` : "إعادة إرسال الكود"; if (s-- <= 0) { b.disabled = false; clearInterval(resendTimer); } };
+  tick(); resendTimer = setInterval(tick, 1000);
+}
+async function resendOTP() {
+  if (!pending) return; $("resendBtn").disabled = true;
+  if (await sendOTP(pending.email)) { clearOtp(); startResendTimer(); } else $("resendBtn").disabled = false;
+}
+
+async function handleVerifyOTP() {
+  const btn = $("otpBtn"); if (btn.disabled) return;
+  const entered = getOtp();
+  if (entered.length < 6) return toast("اكتب الكود كامل (6 أرقام).", "err");
+  if (!otpState || !pending) { toast("الكود انتهى. اطلب كود جديد.", "err"); return; }
+  if (Date.now() > otpState.exp) { otpState = null; toast("انتهت صلاحية الكود. اضغط إعادة الإرسال.", "err"); return; }
+  if (entered !== otpState.code) {
+    otpState.tries++;
+    $("otpBoxes").classList.remove("shake"); void $("otpBoxes").offsetWidth; $("otpBoxes").classList.add("shake");
+    if (otpState.tries >= MAX_TRIES) { otpState = null; toast("محاولات كتير غلط. اطلب كود جديد.", "err"); } else toast("الكود غير صحيح.", "err");
+    return clearOtp();
+  }
+  if (flow === "reset" && $("newPass").value.length < 6) return toast("كلمة المرور الجديدة لازم 6 أحرف على الأقل.", "err");
+
+  setBusy(btn, true, "جاري التفعيل...");
+  const email = pending.email; otpState = null;
+  await fetchServerData();
+  const token = rand(24);
+  let user = currentServerData.users.find(u => u.email === email);
+  if (flow === "reset") {
+    if (!user) { toast("الحساب غير موجود.", "err"); return setBusy(btn, false, "تغيير كلمة المرور والدخول"); }
+    user.password = await hashPass($("newPass").value); user.devices = [token];
+  } else if (flow === "register") {
+    if (!user) { user = { email, password: await hashPass(pending.password), joinedAt: new Date().toLocaleDateString("ar-EG"), devices: [] }; currentServerData.users.push(user); }
+    user.devices = [...(user.devices || []), token].slice(-MAX_DEVICES);
+  } else { // login on a new device
+    if (!user) { toast("الحساب غير موجود.", "err"); return setBusy(btn, false, "تحقق والدخول"); }
+    if (!user.password.startsWith("sha256:")) { const h = await hashPass(pending.password); if (h.startsWith("sha256:")) user.password = h; }
+    user.devices = [...(user.devices || []), token].slice(-MAX_DEVICES);
+  }
+  const ok = await updateServerData(currentServerData);
+  if (!ok) { toast("تعذر الحفظ على السيرفر. حاول مرة أخرى.", "err"); return setBusy(btn, false, "تحقق والدخول"); }
+  saveSession(email, token);
+  pending = null; clearInterval(resendTimer);
+  setBusy(btn, false, "تحقق والدخول");
+  toast(flow === "reset" ? "تم تغيير كلمة المرور بنجاح." : "تم التحقق بنجاح! أهلاً بيك.", "ok");
+  enterDashboard(email);
+}
+
+/* forgot password */
+async function handleForgot(e) {
+  e.preventDefault();
+  const email = $("forgotEmail").value.trim().toLowerCase(), btn = $("forgotBtn");
+  setBusy(btn, true, "جاري البحث...");
+  const data = await fetchServerData();
+  const done = () => setBusy(btn, false, "إرسال كود الاسترجاع");
+  if (!data) { toast("تعذر الاتصال بالسيرفر.", "err"); return done(); }
+  if (!data.users.some(u => u.email === email)) { toast("مفيش حساب بالإيميل ده.", "err"); return done(); }
+  pending = { email, mode: "reset" }; flow = "reset";
+  setBusy(btn, true, "جاري إرسال الكود...");
+  const sent = await sendOTP(email); done();
+  if (sent) openOtp(email);
+}
+
+/* ---------- device session ---------- */
+function saveSession(email, token) { try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); s.last = email; s[email] = token; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {} }
+function getSession(email) { try { return (JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"))[email] || null; } catch (e) { return null; } }
+function lastSession() { try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); return s.last ? { email: s.last, token: s[s.last] } : null; } catch (e) { return null; } }
+
+async function autoLogin() {
+  const s = lastSession();
+  if (!s || !s.token) return false;
+  const data = await fetchServerData();
+  if (!data) { toast("مفيش اتصال بالسيرفر حالياً.", "err"); return false; }
+  const u = data.users.find(x => x.email === s.email);
+  if (u && (u.devices || []).includes(s.token)) { enterDashboard(s.email, true); return true; }
+  return false;
+}
+function logout() {
+  try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); delete s.last; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
+  clearInterval(pollId); pollId = null; currentUserEmail = "";
+  $("userPassword").value = "";
+  switchAuthTab("login"); show("step-auth");
+  toast("تم تسجيل الخروج. الجهاز لسه موثوق — سجّل دخول بالباسورد بدون كود.", "ok");
+}
+
+/* ---------- dashboard ---------- */
+function enterDashboard(email, silent) {
+  currentUserEmail = email; saveLast(email);
+  $("userBadge").innerText = email; $("avatar").innerText = email[0] || "S";
+  const owner = isOwnerEmail(email);
+  $("ownerBadgeContainer").innerHTML = owner ? `<span class="owner-tag">${ic("crown")} المالك الرئيسي</span>` : "";
+  $("ownerSection").classList.toggle("hidden", !owner);
+  buildTabs(); $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  show("step-dashboard");
+  if (silent) toast("أهلاً بيك تاني " + email.split("@")[0], "ok");
+  syncWithServer(); clearInterval(pollId); pollId = setInterval(syncWithServer, 8000);
+}
+function saveLast(email) { try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); s.last = email; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {} }
+
+$("subjectSelect").innerHTML = Object.entries(SUBJECTS).map(([k, v]) => `<option value="${k}">${k} (${v.ar})</option>`).join("");
+function buildTabs() {
+  const files = window.cachedFiles || [], cnt = k => k === "All" ? files.length : files.filter(f => f.subject === k).length;
+  $("tabs").innerHTML = [["All", "الكل", "folder"], ...Object.entries(SUBJECTS).map(([k, v]) => [k, k, v.icon])]
+    .map(([k, l, i]) => `<button class="tab ${currentFilter === k ? "on" : ""}" onclick="filterBy('${k}')">${ic(i)}${esc(l)}<em>${cnt(k)}</em></button>`).join("");
+}
+function filterBy(s) { currentFilter = s; buildTabs(); renderFileList(window.cachedFiles || []); }
+
+function countUp(el, to) {
+  const from = +el.innerText || 0; if (from === to) return; const t0 = performance.now();
+  (function f(t) { const p = Math.min(1, (t - t0) / 700); el.innerText = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); })(t0);
+}
+async function syncWithServer() {
+  const d = await fetchServerData(); if (!d) return;
+  countUp($("statTotalUsers"), d.users.length); countUp($("statTotalFiles"), d.files.length);
+  const sig = d.files.map(f => f.id).join(",");
+  window.cachedFiles = d.files;
+  if (sig !== window._sig) { window._sig = sig; window._fresh = true; }
+  buildTabs(); renderFileList(d.files);
+}
+
+/* upload */
+const fi = $("fileInput");
+fi.addEventListener("change", () => { $("dropName").innerText = fi.files[0] ? fi.files[0].name : "اسحب الملف هنا أو اضغط للاختيار"; });
+["dragenter", "dragover"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => { if (e.dataTransfer.files.length) { fi.files = e.dataTransfer.files; fi.dispatchEvent(new Event("change")); } });
+
+async function handleUploadFile() {
+  const subject = $("subjectSelect").value, btn = $("uploadBtn");
+  if (!fi.files.length) return toast("اختار ملف الأول.", "err");
+  const file = fi.files[0];
+  if (file.size > 700 * 1024) return toast("الملف كبير. الحد الأقصى 700KB.", "err");
+  setBusy(btn, true, "جاري الرفع..."); const pr = $("prog"); pr.style.display = "block"; pr.firstChild.style.width = "15%";
+  const reader = new FileReader();
+  reader.onprogress = e => { if (e.lengthComputable) pr.firstChild.style.width = 15 + 45 * e.loaded / e.total + "%"; };
+  reader.onerror = () => { toast("تعذر قراءة الملف.", "err"); setBusy(btn, false, "رفع ومشاركة الملف"); pr.style.display = "none"; };
+  reader.onload = async e => {
+    pr.firstChild.style.width = "70%";
+    const rec = { id: Date.now().toString(), name: file.name, type: file.type || "application/octet-stream", size: (file.size / 1024).toFixed(1) + " KB", subject, date: new Date().toLocaleDateString("ar-EG"), uploader: currentUserEmail, dataUrl: e.target.result };
+    await fetchServerData(); currentServerData.files.unshift(rec);
+    const ok = await updateServerData(currentServerData);
+    pr.firstChild.style.width = "100%";
+    setTimeout(() => { pr.style.display = "none"; pr.firstChild.style.width = "0"; }, 500);
+    setBusy(btn, false, "رفع ومشاركة الملف");
+    if (ok) { toast("تم رفع ومشاركة الملف بنجاح!", "ok"); fi.value = ""; $("dropName").innerText = "اسحب الملف هنا أو اضغط للاختيار"; window._sig = null; syncWithServer(); }
+    else toast("فشل الرفع. حاول مرة أخرى.", "err");
+  };
+  reader.readAsDataURL(file);
+}
+
+function fileIcon(f) { return (f.type || "").startsWith("image/") ? "img" : "file"; }
+function renderFileList(all) {
+  const box = $("filesList"), owner = isOwnerEmail(currentUserEmail), q = ($("searchInput").value || "").trim().toLowerCase();
+  let files = all; if (currentFilter !== "All") files = files.filter(f => f.subject === currentFilter);
+  if (q) files = files.filter(f => (f.name || "").toLowerCase().includes(q));
+  if (!files.length) { box.innerHTML = `<div class="empty">${ic("folder")}لا توجد ملفات في هذا القسم حالياً.</div>`; return; }
+  const animate = window._fresh; window._fresh = false;
+  box.innerHTML = files.map((f, i) => {
+    const s = SUBJECTS[f.subject] || { c: "#6366f1" }, can = owner || f.uploader === currentUserEmail;
+    return `<div class="file" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
+      <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${ic(fileIcon(f))}</div>
+        <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(f.uploader)} • ${esc(f.date)}</div></div></div>
+      <div class="fa"><span class="badge" style="background:${s.c}22;color:${s.c}">${esc(f.subject)}</span>
+        <button class="btn-sm" onclick="openFile('${esc(f.id)}')">${ic("open")}فتح</button>
+        ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')">${ic("trash")}</button>` : ""}</div></div>`;
+  }).join("");
+}
+function openFile(id) {
+  const file = (window.cachedFiles || []).find(f => f.id == id); if (!file) return;
+  if (file.type.startsWith("image/") || file.type === "application/pdf") {
+    const win = window.open(); if (!win) return toast("اسمح بالنوافذ المنبثقة لفتح الملف.", "err");
+    win.document.write(`<title>${esc(file.name)}</title><body style="margin:0;background:#f8fafc"><iframe src="${file.dataUrl}" style="border:none;width:100vw;height:100vh"></iframe></body>`);
+  } else { const a = document.createElement("a"); a.href = file.dataUrl; a.download = file.name; a.click(); }
+}
+async function deleteServerFile(id) {
+  if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
+  await fetchServerData(); currentServerData.files = currentServerData.files.filter(f => f.id != id);
+  if (await updateServerData(currentServerData)) toast("تم حذف الملف.", "ok"); else toast("فشل الحذف.", "err");
+  window._sig = null; syncWithServer();
+}
+async function clearAllServerFiles() {
+  if (!confirm("تحذير: مسح جميع الملفات من السيرفر نهائياً؟")) return;
+  await fetchServerData(); currentServerData.files = [];
+  if (await updateServerData(currentServerData)) toast("تم مسح كافة الملفات.", "ok"); else toast("فشل المسح.", "err");
+  window._sig = null; syncWithServer();
+}
+
+/* AI agent */
+function runAIAudit() {
+  const r = $("agentResult"), files = window.cachedFiles || []; r.style.display = "block";
+  if (!files.length) { r.innerHTML = `${ic("bot")} <b>تقرير الـ Agent:</b> مفيش ماتيريال لسه. ارفع ملفات وأنا أنظمها.`; return; }
+  const c = {}; files.forEach(f => c[f.subject] = (c[f.subject] || 0) + 1);
+  const max = Math.max(...Object.values(c));
+  r.innerHTML = `${ic("bot")} <b>تحليل الـ AI Agent:</b><br>تم فحص <b>${files.length}</b> ملف.<br>` +
+    Object.keys(SUBJECTS).map(k => `<div>${ic(SUBJECTS[k].icon)} ${k}: <b>${c[k] || 0}</b><span class="bar"><i style="--w:${(c[k] || 0) / max * 100}%"></i></span></div>`).join("") +
+    `<div style="color:var(--ok);font-weight:800;margin-top:6px">${ic("check")} تم التحقق من سلامة التصنيف.</div>`;
+}
+function runAISuggestions() {
+  const r = $("agentResult"), files = window.cachedFiles || []; r.style.display = "block";
+  const have = new Set(files.map(f => f.subject)), missing = Object.keys(SUBJECTS).filter(s => !have.has(s));
+  r.innerHTML = `${ic("bulb")} <b>توصيات الـ AI Agent:</b><br>` + (missing.length
+    ? `المواد دي لسه فاضية: <b>${missing.join(", ")}</b>.<br>ابدأ بملخصات الـ Learning Outcomes وأسئلة الامتحانات السابقة.`
+    : `ممتاز! كل المواد فيها مصادر.<br>أضف أسئلة الكابستون (Capstone reflections & research rubrics) لكل قسم.`);
+}
+
+/* boot */
+(async function () {
+  switchAuthTab("register");
+  const ok = await autoLogin();
+  if (!ok) show("step-auth");
+  $("splash").style.opacity = 0; setTimeout(() => $("splash").remove(), 400);
+})();
+</script>
+</body>
+</html>
