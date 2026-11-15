@@ -268,6 +268,8 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
     <div id="ownerSection" class="owner hidden">
       <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
         <button class="btn-sm danger" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
+      <div class="agent-actions" style="margin-top:12px"><button class="btn-sm" style="flex:1;justify-content:center" onclick="toggleUsers()"><svg class="i"><use href="#i-users"/></svg><span id="usersBtnTxt">عرض المستخدمين وإيميلاتهم</span></button><button class="btn-sm" onclick="copyEmails()"><svg class="i"><use href="#i-mail"/></svg>نسخ كل الإيميلات</button></div>
+      <div id="usersBox" class="hidden" style="margin-top:12px"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="userSearch" placeholder="ابحث بالإيميل..." oninput="renderUsers()"></div><div id="usersList" style="margin-top:8px;max-height:320px;overflow:auto"></div></div>
       <div class="stats">
         <div class="stat"><div class="ic"><svg class="i"><use href="#i-users"/></svg></div><div><b id="statTotalUsers">0</b><span>إجمالي الطلاب المسجلين</span></div></div>
         <div class="stat"><div class="ic"><svg class="i"><use href="#i-folder"/></svg></div><div><b id="statTotalFiles">0</b><span>إجمالي الملفات المشتركة</span></div></div>
@@ -611,7 +613,7 @@ async function syncWithServer() {
   const sig = d.files.map(f => f.id).join(",");
   window.cachedFiles = d.files;
   if (sig !== window._sig) { window._sig = sig; window._fresh = true; }
-  buildTabs(); renderFileList(d.files);
+  buildTabs(); renderFileList(d.files); if (isOwnerEmail(currentUserEmail) && !$("usersBox").classList.contains("hidden")) renderUsers();
 }
 
 /* chunked file storage: each chunk lives in its own bin so size isn't limited by one bin */
@@ -626,6 +628,25 @@ async function readFileData(f) {
   return parts.join("");
 }
 function deleteBins(f) { (f.bins || []).forEach(id => fetch(`https://api.jsonbin.io/v3/b/${id}`, { method: "DELETE", headers: { "X-Master-Key": MASTER_KEY } }).catch(() => {})); }
+
+/* owner: users list */
+function toggleUsers() {
+  if (!isOwnerEmail(currentUserEmail)) return;
+  const b = $("usersBox"), open = b.classList.toggle("hidden") === false;
+  $("usersBtnTxt").innerText = open ? "إخفاء المستخدمين" : "عرض المستخدمين وإيميلاتهم";
+  if (open) renderUsers();
+}
+function renderUsers() {
+  if (!isOwnerEmail(currentUserEmail)) return;
+  const q = ($("userSearch").value || "").trim().toLowerCase(), us = (currentServerData.users || []).filter(u => u.email.toLowerCase().includes(q));
+  const fc = {}; (currentServerData.files || []).forEach(f => fc[f.uploader] = (fc[f.uploader] || 0) + 1);
+  $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.email)}</strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><span class="badge">#${i + 1}</span></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
+}
+function copyEmails() {
+  if (!isOwnerEmail(currentUserEmail)) return;
+  const t = (currentServerData.users || []).map(u => u.email).join("\n");
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast("تم نسخ " + (currentServerData.users || []).length + " إيميل.", "ok")).catch(() => toast("تعذر النسخ.", "err"));
+}
 
 /* upload */
 const fi = $("fileInput");
