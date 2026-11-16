@@ -174,6 +174,44 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 .splash .logo{animation:pop .8s both,glow 2s infinite}
 @media(max-width:520px){.card{padding:24px 18px;border-radius:20px}.otp input{height:54px;font-size:22px}.otp{gap:6px}.theme-btn span{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ===== section animations ===== */
+.rv{opacity:0;transform:translateY(30px) scale(.98);filter:blur(6px);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1),filter .7s;transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none;filter:none}
+.rv.from-l{transform:translateX(-40px)}.rv.from-r{transform:translateX(40px)}.rv.from-l.in,.rv.from-r.in{transform:none}
+.avatar{animation:pop .7s cubic-bezier(.3,1.6,.5,1) both}
+.avatar:hover{animation:wob .6s}
+@keyframes wob{25%{transform:rotate(-10deg) scale(1.1)}75%{transform:rotate(10deg) scale(1.1)}}
+.stat.in .ic{animation:pop .6s .2s both}
+.stat b{display:inline-block;transition:transform .3s}.stat:hover b{transform:scale(1.15)}
+.stat .ic svg{transition:transform .4s}.stat:hover .ic svg{transform:rotate(12deg) scale(1.2)}
+.owner{position:relative;overflow:hidden}
+.owner::after{content:"";position:absolute;top:0;bottom:0;width:60%;left:-80%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation:sweep 5s ease-in-out infinite 1.5s;pointer-events:none}
+@keyframes sweep{0%,60%,100%{left:-80%}30%{left:130%}}
+.owner-tag svg{animation:wob 2.4s ease-in-out infinite}
+.agent-title svg{animation:bob 2.2s ease-in-out infinite}
+.live{position:relative;padding-inline-start:18px}.live::before{content:"";position:absolute;inset-inline-start:7px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#10b981;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.btn-sm svg{transition:transform .3s}.btn-sm:hover svg{transform:scale(1.2) rotate(-8deg)}
+.btn-sm:active{transform:scale(.95)}
+.drop.over svg{animation:none;transform:translateY(-6px) scale(1.25)}
+.drop{position:relative}.drop::before{content:"";position:absolute;inset:-2px;border-radius:18px;border:2px solid var(--primary);opacity:0;animation:ring 2.8s infinite;pointer-events:none}
+@keyframes ring{0%{opacity:.5;transform:scale(1)}100%{opacity:0;transform:scale(1.04)}}
+.tab svg{transition:transform .3s}.tab:hover svg{transform:scale(1.25) rotate(-8deg)}.tab.on svg{animation:pop .4s}
+.tab em{transition:transform .3s}.tab.on em{transform:scale(1.1)}
+.tabs.rv .tab{animation:rise .5s both;animation-delay:calc(var(--i,0)*60ms)}
+.fic{transition:transform .35s cubic-bezier(.3,1.6,.5,1)}.file:hover .fic{transform:rotate(-8deg) scale(1.12)}
+.file{border-inline-start:3px solid transparent}.file:hover{border-inline-start-color:var(--primary)}
+.file.leaving{animation:leave .35s forwards}
+@keyframes leave{to{opacity:0;transform:translateX(60px) scale(.95);height:0;padding:0;margin:0}}
+.field input{transition:border-color .2s,box-shadow .2s,transform .2s}.field:focus-within input{transform:translateY(-1px)}
+.seg button{transition:color .25s,transform .2s}.seg button:active{transform:scale(.95)}
+.btn .rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rp .6s ease-out forwards;pointer-events:none}
+@keyframes rp{to{transform:scale(4);opacity:0}}
+.logo svg{animation:spinslow 14s linear infinite}@keyframes spinslow{to{transform:rotate(360deg)}}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:25px;padding:1px;background:conic-gradient(from var(--a,0deg),transparent 70%,var(--primary2),transparent);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:borderspin 8s linear infinite;pointer-events:none;opacity:.7}
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes borderspin{to{--a:360deg}}
 </style>
 </head>
 <body>
@@ -271,13 +309,13 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 
   <!-- 4: dashboard -->
   <div id="step-dashboard" class="card wide view hidden">
-    <div class="dhead">
+    <div class="dhead rv">
       <div class="who"><div class="avatar" id="avatar">S</div>
         <div><h3>مستودع ماتيريالز STEM</h3><small id="userBadge"></small><div id="ownerBadgeContainer"></div></div></div>
       <button class="btn-sm danger" onclick="logout()"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
     </div>
 
-    <div id="ownerSection" class="owner hidden">
+    <div id="ownerSection" class="owner hidden rv from-r">
       <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
         <button class="btn-sm danger" id="clearBtn" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
       <div class="agent-actions" style="margin-top:12px"><button class="btn-sm" style="flex:1;justify-content:center" onclick="toggleUsers()"><svg class="i"><use href="#i-users"/></svg><span id="usersBtnTxt">عرض المستخدمين وإيميلاتهم</span></button><button class="btn-sm" onclick="copyEmails()"><svg class="i"><use href="#i-mail"/></svg>نسخ كل الإيميلات</button></div>
@@ -288,7 +326,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       </div>
     </div>
 
-    <div class="agent">
+    <div class="agent rv from-l">
       <div class="row"><span class="agent-title"><svg class="i"><use href="#i-bot"/></svg>STEM Material AI Agent</span><span class="live">Active</span></div>
       <p>الـ Agent بيفحص الملفات المرفوعة، بيرتبها حسب المادة، وبيكتشف الماتيريال الناقصة.</p>
       <div class="agent-actions">
@@ -298,7 +336,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <div class="agent-res" id="agentResult"></div>
     </div>
 
-    <div class="upload">
+    <div class="upload rv">
       <label for="subjectSelect">المادة العلمية</label>
       <select id="subjectSelect"></select>
       <label>الملف</label>
@@ -310,9 +348,9 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <button class="btn" id="uploadBtn" onclick="handleUploadFile()"><svg class="i"><use href="#i-upload"/></svg><span>رفع ومشاركة الملف</span></button>
     </div>
 
-    <div class="tools"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
-    <div class="tabs" id="tabs"></div>
-    <div id="filesList"></div>
+    <div class="tools rv"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
+    <div class="tabs rv" id="tabs"></div>
+    <div id="filesList" class="rv"></div>
   </div>
 </div>
 
@@ -609,7 +647,7 @@ function enterDashboard(email, silent) {
   $("ownerSection").classList.toggle("hidden", !staff);
   $("clearBtn").classList.toggle("hidden", !staff);
   buildTabs(); $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-  show("step-dashboard");
+  show("step-dashboard"); setTimeout(() => revealAll($("step-dashboard")), 60);
   if (silent) toast("أهلاً بيك تاني " + email.split("@")[0], "ok");
   syncWithServer(); clearInterval(pollId); pollId = setInterval(syncWithServer, 8000);
 }
@@ -619,7 +657,7 @@ $("subjectSelect").innerHTML = Object.entries(SUBJECTS).map(([k, v]) => `<option
 function buildTabs() {
   const files = window.cachedFiles || [], cnt = k => k === "All" ? files.length : files.filter(f => f.subject === k).length;
   $("tabs").innerHTML = [["All", "الكل", "folder"], ...Object.entries(SUBJECTS).map(([k, v]) => [k, k, v.icon])]
-    .map(([k, l, i]) => `<button class="tab ${currentFilter === k ? "on" : ""}" onclick="filterBy('${k}')">${ic(i)}${esc(l)}<em>${cnt(k)}</em></button>`).join("");
+    .map(([k, l, i], n) => `<button style="--i:${n}" class="tab ${currentFilter === k ? "on" : ""}" onclick="filterBy('${k}')">${ic(i)}${esc(l)}<em>${cnt(k)}</em></button>`).join("");
 }
 function filterBy(s) { currentFilter = s; buildTabs(); renderFileList(window.cachedFiles || []); }
 
@@ -743,7 +781,7 @@ function renderFileList(all) {
   const animate = window._fresh; window._fresh = false;
   box.innerHTML = files.map((f, i) => {
     const s = SUBJECTS[f.subject] || { c: "#6366f1" }, can = owner || f.uploader === currentUserEmail;
-    return `<div class="file" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
+    return `<div class="file" data-id="${esc(f.id)}" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
       <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${ic(fileIcon(f))}</div>
         <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(f.uploader)} • ${esc(f.date)}</div></div></div>
       <div class="fa"><span class="badge" style="background:${s.c}22;color:${s.c}">${esc(f.subject)}</span>
@@ -769,6 +807,7 @@ async function openFile(id) {
 }
 async function deleteServerFile(id) {
   if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
+  const card = document.querySelector(`.file[data-id="${id}"]`); if (card) { card.classList.add("leaving"); await new Promise(r => setTimeout(r, 330)); }
   await fetchServerData(); deleteBins(currentServerData.files.find(f => f.id == id) || {}); currentServerData.files = currentServerData.files.filter(f => f.id != id);
   if (await updateServerData(currentServerData)) toast("تم حذف الملف.", "ok"); else toast("فشل الحذف.", "err");
   window._sig = null; syncWithServer();
@@ -797,6 +836,24 @@ function runAISuggestions() {
     ? `المواد دي لسه فاضية: <b>${missing.join(", ")}</b>.<br>ابدأ بملخصات الـ Learning Outcomes وأسئلة الامتحانات السابقة.`
     : `ممتاز! كل المواد فيها مصادر.<br>أضف أسئلة الكابستون (Capstone reflections & research rubrics) لكل قسم.`);
 }
+
+
+/* ===== reveal + micro animations ===== */
+const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 }) : null;
+function revealAll(root) {
+  const els = [...(root || document).querySelectorAll(".rv,.stat")];
+  els.forEach((el, i) => {
+    el.classList.remove("in"); el.style.setProperty("--d", Math.min(i, 8) * 90 + "ms");
+    if (!el.classList.contains("rv")) el.classList.add("rv");
+    if (io) { void el.offsetWidth; io.observe(el); } else el.classList.add("in");
+  });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".btn"); if (!b || b.classList.contains("ghost") || b.disabled) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height), sp = document.createElement("span");
+  sp.className = "rip"; sp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+  b.appendChild(sp); setTimeout(() => sp.remove(), 650);
+});
 
 /* boot */
 (async function () {
