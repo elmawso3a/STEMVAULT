@@ -212,6 +212,30 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 .card::before{content:"";position:absolute;inset:-1px;border-radius:25px;padding:1px;background:conic-gradient(from var(--a,0deg),transparent 70%,var(--primary2),transparent);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:borderspin 8s linear infinite;pointer-events:none;opacity:.7}
 @property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
 @keyframes borderspin{to{--a:360deg}}
+
+/* ===== nickname + chat ===== */
+.nick-hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.fab{position:fixed;bottom:20px;inset-inline-end:20px;z-index:60;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 12px 30px -8px var(--primary);display:grid;place-items:center;transition:transform .25s;animation:pop .6s cubic-bezier(.3,1.6,.5,1) both}
+.fab:hover{transform:scale(1.1) rotate(-6deg)}.fab svg{width:26px;height:26px}
+.fab .cnt{position:absolute;top:-4px;inset-inline-start:-4px;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--err);color:#fff;font:800 12px 'Tajawal',sans-serif;display:grid;place-items:center;animation:pop .4s both}
+.chat{position:fixed;bottom:90px;inset-inline-end:20px;z-index:61;width:min(400px,calc(100vw - 24px));height:min(560px,calc(100vh - 120px));display:flex;flex-direction:column;background:var(--card-solid);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;transform-origin:bottom left;animation:chatin .35s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes chatin{from{opacity:0;transform:translateY(24px) scale(.92)}}
+.chat-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-weight:800}
+.chat-h small{display:block;font-weight:500;opacity:.85;font-size:11px}
+.chat-h button{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.msg{max-width:85%;display:flex;flex-direction:column;gap:3px;animation:rise .35s both}
+.msg .who2{font-size:11.5px;font-weight:800;color:var(--primary);display:flex;gap:5px;align-items:center}
+.msg .bub{background:var(--card-solid);border:1px solid var(--border);padding:9px 13px;border-radius:16px;border-start-start-radius:4px;font-size:14px;line-height:1.6;word-break:break-word;white-space:pre-wrap}
+.msg .t{font-size:10.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.msg .t button{background:none;border:none;color:var(--err);cursor:pointer;font:700 10.5px 'Tajawal',sans-serif;padding:0}
+.msg.me{align-self:flex-start}.msg.me .bub{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:none;border-start-start-radius:16px;border-end-start-radius:4px}
+.msg.me .who2{color:var(--muted)}
+.chat-f{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:var(--card-solid)}
+.chat-f input{flex:1}.chat-f button{width:46px;flex:none;border:none;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;cursor:pointer;display:grid;place-items:center;transition:transform .2s}
+.chat-f button:hover{transform:scale(1.06)}.chat-f button:disabled{opacity:.5}
+.chat-f svg{transform:scaleX(-1)}
+.sys{align-self:center;font-size:11.5px;color:var(--muted);background:var(--input);padding:3px 12px;border-radius:99px}
 </style>
 </head>
 <body>
@@ -246,6 +270,9 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 <symbol id="i-math" viewBox="0 0 24 24"><path d="M18 5H7l6 7-6 7h11"/></symbol>
 <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
 <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2M18 2v4h-4M6 22v-4h4"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
 </defs></svg>
 <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid-bg"></div></div>
 
@@ -307,6 +334,20 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
     <p class="sub" style="margin:14px 0 0;font-size:12px"><svg class="i"><use href="#i-shield"/></svg> الكود بيتطلب مرة واحدة بس، وبعدها الجهاز ده يفضل مسجّل.</p>
   </div>
 
+  <!-- 3b: nickname (mandatory) -->
+  <div id="step-nick" class="card view hidden">
+    <div class="mailico"><svg class="i"><use href="#i-users"/></svg></div>
+    <h2 id="nickTitle">اختار اسمك المستعار</h2>
+    <p class="sub">الاسم ده اللي هيظهر للناس في الشات والملفات بدل إيميلك. لازم تختاره عشان تكمل.</p>
+    <form onsubmit="handleNick(event)">
+      <label for="nickInput">النيك نيم</label>
+      <div class="field"><svg class="i"><use href="#i-users"/></svg><input id="nickInput" maxlength="20" minlength="3" required placeholder="مثال: Ahmed_STEM" autocomplete="nickname"></div>
+      <div class="nick-hint">3–20 حرف: حروف عربي/إنجليزي وأرقام و _ و - بس. مش لازم يتكرر مع حد تاني.</div>
+      <button class="btn" id="nickBtn" type="submit"><span>حفظ ومتابعة</span></button>
+    </form>
+    <button class="btn ghost hidden" id="nickCancel" type="button" onclick="show('step-dashboard')">إلغاء</button>
+  </div>
+
   <!-- 4: dashboard -->
   <div id="step-dashboard" class="card wide view hidden">
     <div class="dhead rv">
@@ -354,6 +395,12 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
   </div>
 </div>
 
+<button class="fab hidden" id="chatFab" onclick="toggleChat()" aria-label="الشات"><svg class="i"><use href="#i-chat"/></svg><span class="cnt hidden" id="chatCnt">0</span></button>
+<div class="chat hidden" id="chatBox" role="dialog" aria-label="الشات العام">
+  <div class="chat-h"><div>الشات العام<small id="chatSub">كل الأعضاء بيتكلموا هنا</small></div><button onclick="toggleChat()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="msgs" id="msgs"></div>
+  <form class="chat-f" onsubmit="sendChat(event)"><input id="chatInput" maxlength="300" placeholder="اكتب رسالتك..." autocomplete="off"><button id="chatSend" type="submit" aria-label="إرسال"><svg class="i"><use href="#i-send"/></svg></button></form>
+</div>
 <script>
 const OWNER_EMAIL = "hobazeema900@gmail.com";
 const SERVICE_ID  = "service_nzthyi8";
@@ -413,9 +460,10 @@ function toggleTheme() {
 
 /* ---------- views ---------- */
 function show(id) {
-  ["step-auth", "step-forgot", "step-otp", "step-dashboard"].forEach(v => $(v).classList.add("hidden"));
+  ["step-auth", "step-forgot", "step-otp", "step-nick", "step-dashboard"].forEach(v => $(v).classList.add("hidden"));
   const el = $(id); el.classList.remove("hidden"); el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (id !== "step-dashboard") { $("chatFab").classList.add("hidden"); $("chatBox").classList.add("hidden"); }
 }
 function setBusy(btn, busy, label) {
   btn.disabled = busy;
@@ -632,24 +680,52 @@ async function autoLogin() {
 }
 function logout() {
   try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); delete s.last; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
-  clearInterval(pollId); pollId = null; currentUserEmail = "";
+  clearInterval(pollId); pollId = null; clearInterval(chatPoll); chatPoll = null; currentUserEmail = "";
   $("userPassword").value = "";
   switchAuthTab("login"); show("step-auth");
   toast("تم تسجيل الخروج. الجهاز لسه موثوق — سجّل دخول بالباسورد بدون كود.", "ok");
 }
 
 /* ---------- dashboard ---------- */
+const userOf = e => (currentServerData.users || []).find(u => u.email === e);
+let pendingEnter = null;
 function enterDashboard(email, silent) {
+  const u = userOf(email);
+  if (u && !u.nickname) { pendingEnter = { email, silent }; currentUserEmail = email; $("nickTitle").innerText = "اختار اسمك المستعار"; $("nickCancel").classList.add("hidden"); $("nickInput").value = ""; show("step-nick"); setTimeout(() => $("nickInput").focus(), 300); return; }
+  enterDashboardReal(email, silent);
+}
+const NICK_RE = /^[\p{L}\p{N}_ .-]{3,20}$/u, RESERVED = /(owner|admin|moderator|co-?owner|staff|مالك|مشرف|ادمن|أدمن)/i;
+async function handleNick(e) {
+  e.preventDefault(); const btn = $("nickBtn"); let n = $("nickInput").value.trim().replace(/\s+/g, " ");
+  if (!NICK_RE.test(n)) return toast("الاسم لازم 3–20 حرف (حروف وأرقام و _ - بس).", "err");
+  const email = pendingEnter ? pendingEnter.email : currentUserEmail;
+  if (!isStaff(email) && RESERVED.test(n)) return toast("الاسم ده محجوز، اختار اسم تاني.", "err");
+  setBusy(btn, true, "جاري الحفظ...");
+  const d = await fetchServerData(); const back = () => setBusy(btn, false, "حفظ ومتابعة");
+  if (!d) { toast("تعذر الاتصال بالسيرفر.", "err"); return back(); }
+  if (d.users.some(u => u.email !== email && (u.nickname || "").toLowerCase() === n.toLowerCase())) { toast("الاسم ده مستخدم، اختار اسم تاني.", "err"); return back(); }
+  const u = d.users.find(x => x.email === email); if (!u) { toast("الحساب غير موجود.", "err"); return back(); }
+  u.nickname = n;
+  if (!(await updateServerData(d))) { toast("فشل الحفظ. حاول تاني.", "err"); return back(); }
+  back(); toast("تم حفظ الاسم: " + n, "ok");
+  const p = pendingEnter; pendingEnter = null; enterDashboardReal(email, p ? p.silent : false);
+}
+function changeNick() { $("nickTitle").innerText = "تغيير الاسم المستعار"; $("nickInput").value = (userOf(currentUserEmail) || {}).nickname || ""; $("nickCancel").classList.remove("hidden"); pendingEnter = null; show("step-nick"); }
+const nickOf = e => (userOf(e) || {}).nickname || "عضو";
+const uploaderName = e => isStaff(currentUserEmail) ? `${nickOf(e)} (${e})` : nickOf(e);
+function enterDashboardReal(email, silent) {
   currentUserEmail = email; saveLast(email);
-  $("userBadge").innerText = email; $("avatar").innerText = email[0] || "S";
+  const nk = nickOf(email); $("userBadge").innerHTML = `${esc(nk)} <button class="link" style="font-size:11px" onclick="changeNick()">(تغيير)</button><br><span style="opacity:.7">${esc(email)}</span>`; $("avatar").innerText = nk[0] || "S";
   const owner = isOwnerEmail(email), staff = isStaff(email);
   $("ownerBadgeContainer").innerHTML = owner ? `<span class="owner-tag">${ic("crown")} المالك الرئيسي</span>` : (staff ? `<span class="owner-tag">${ic("crown")} Co-Owner</span>` : "");
   $("ownerSection").classList.toggle("hidden", !staff);
   $("clearBtn").classList.toggle("hidden", !staff);
   buildTabs(); $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   show("step-dashboard"); setTimeout(() => revealAll($("step-dashboard")), 60);
-  if (silent) toast("أهلاً بيك تاني " + email.split("@")[0], "ok");
-  syncWithServer(); clearInterval(pollId); pollId = setInterval(syncWithServer, 8000);
+  if (silent) toast("أهلاً بيك تاني " + nk, "ok");
+  $("chatFab").classList.remove("hidden"); window._lastSeen = +(localStorage.getItem("sv_chat_seen_" + email) || 0);
+  syncWithServer(); clearInterval(pollId); pollId = setInterval(() => { if (!document.hidden) syncWithServer(); }, 15000);
+  clearInterval(chatPoll); chatPoll = setInterval(() => { if (!document.hidden) pollChat(); }, 5000); pollChat();
 }
 function saveLast(email) { try { const s = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); s.last = email; localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {} }
 
@@ -665,8 +741,11 @@ function countUp(el, to) {
   const from = +el.innerText || 0; if (from === to) return; const t0 = performance.now();
   (function f(t) { const p = Math.min(1, (t - t0) / 700); el.innerText = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); })(t0);
 }
+let syncing = false;
 async function syncWithServer() {
-  const d = await fetchServerData(); if (!d) return;
+  if (syncing) return; syncing = true;
+  let d; try { d = await fetchServerData(); } finally { syncing = false; }
+  if (!d) return;
   countUp($("statTotalUsers"), d.users.length); countUp($("statTotalFiles"), d.files.length);
   const sig = d.files.map(f => f.id).join(",");
   window.cachedFiles = d.files;
@@ -717,7 +796,7 @@ function renderUsers() {
   if (!isStaff(currentUserEmail)) return;
   const q = ($("userSearch").value || "").trim().toLowerCase(), us = (currentServerData.users || []).filter(u => u.email.toLowerCase().includes(q));
   const fc = {}; (currentServerData.files || []).forEach(f => fc[f.uploader] = (fc[f.uploader] || 0) + 1);
-  $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.email)}</strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><div class="fa">${u.banned ? `<span class="badge" style="background:rgba(225,29,72,.12);color:var(--err)">محظور</span>` : ""}${canBan(u.email) ? `<button class="btn-sm ${u.banned ? "" : "danger"}" onclick="banUser('${esc(u.email)}', ${!u.banned})">${u.banned ? "إلغاء الحظر" : "حظر"}</button>` : (isStaff(u.email) ? `<span class="badge">${isOwnerEmail(u.email) ? "Owner" : "Co-Owner"}</span>` : "")}</div></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
+  $("usersList").innerHTML = us.length ? us.map((u, i) => `<div class="file" style="margin-top:6px;padding:10px 12px;animation:none"><div class="fi"><div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:15px">${esc(u.email[0])}</div><div style="min-width:0"><strong style="font-size:13px">${esc(u.nickname || "—")} <span style="font-weight:500;color:var(--muted)">${esc(u.email)}</span></strong><div class="meta">انضم: ${esc(u.joinedAt || "—")} • ملفات: ${fc[u.email] || 0} • أجهزة: ${(u.devices || []).length}</div></div></div><div class="fa">${u.banned ? `<span class="badge" style="background:rgba(225,29,72,.12);color:var(--err)">محظور</span>` : ""}${canBan(u.email) ? `<button class="btn-sm ${u.banned ? "" : "danger"}" onclick="banUser('${esc(u.email)}', ${!u.banned})">${u.banned ? "إلغاء الحظر" : "حظر"}</button>` : (isStaff(u.email) ? `<span class="badge">${isOwnerEmail(u.email) ? "Owner" : "Co-Owner"}</span>` : "")}</div></div>`).join("") : '<div class="empty" style="padding:16px">لا يوجد مستخدمين.</div>';
 }
 function canBan(email) {
   if (!isStaff(currentUserEmail) || isOwnerEmail(email) || email === currentUserEmail) return false;
@@ -783,7 +862,7 @@ function renderFileList(all) {
     const s = SUBJECTS[f.subject] || { c: "#6366f1" }, can = owner || f.uploader === currentUserEmail;
     return `<div class="file" data-id="${esc(f.id)}" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
       <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${ic(fileIcon(f))}</div>
-        <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(f.uploader)} • ${esc(f.date)}</div></div></div>
+        <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(uploaderName(f.uploader))} • ${esc(f.date)}</div></div></div>
       <div class="fa"><span class="badge" style="background:${s.c}22;color:${s.c}">${esc(f.subject)}</span>
         <button class="btn-sm" onclick="openFile('${esc(f.id)}')">${ic("open")}فتح</button>
         ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')">${ic("trash")}</button>` : ""}</div></div>`;
@@ -854,6 +933,78 @@ document.addEventListener("click", e => {
   sp.className = "rip"; sp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
   b.appendChild(sp); setTimeout(() => sp.remove(), 650);
 });
+
+
+/* ===== community chat (own bin so it never collides with users/files writes) ===== */
+let chatPoll = null, chatOpen = false, chatMsgs = [], lastSend = 0;
+async function uid(email) { const h = await hashPass(email); return h.slice(-10); }
+async function getChatBin() {
+  if (currentServerData.chatBin) return currentServerData.chatBin;
+  const d = await fetchServerData(); if (d && d.chatBin) return d.chatBin;
+  const id = await createBin({ messages: [] }, "sv-chat");
+  const d2 = await fetchServerData(); if (!d2) throw new Error("server");
+  if (!d2.chatBin) { d2.chatBin = id; await updateServerData(d2); currentServerData = d2; return id; }
+  return d2.chatBin;
+}
+async function loadChat() {
+  const id = await getChatBin();
+  const r = await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const rec = (await r.json()).record || {}; return { id, messages: Array.isArray(rec.messages) ? rec.messages : [] };
+}
+async function pollChat() {
+  if (!currentUserEmail) return;
+  try {
+    const { messages } = await loadChat(); chatMsgs = messages; renderChat();
+    const unread = messages.filter(m => m.ts > (window._lastSeen || 0) && m.u !== window._myUid).length;
+    const c = $("chatCnt"); c.innerText = unread > 99 ? "99+" : unread; c.classList.toggle("hidden", chatOpen || !unread);
+  } catch (e) { console.warn("chat", e.message); }
+}
+function toggleChat() {
+  chatOpen = !chatOpen; $("chatBox").classList.toggle("hidden", !chatOpen);
+  if (chatOpen) { window._lastSeen = Date.now(); try { localStorage.setItem("sv_chat_seen_" + currentUserEmail, window._lastSeen); } catch (e) {} $("chatCnt").classList.add("hidden"); renderChat(true); pollChat(); setTimeout(() => $("chatInput").focus(), 200); }
+}
+function fmtT(ts) { const d = new Date(ts); return d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }); }
+async function renderChat(force) {
+  if (!chatOpen && !force) return;
+  window._myUid = window._myUid || await uid(currentUserEmail);
+  const box = $("msgs"), near = box.scrollHeight - box.scrollTop - box.clientHeight < 90;
+  const sig = chatMsgs.map(m => m.id).join(",");
+  if (sig === window._chatSig && !force) return; window._chatSig = sig;
+  const staff = isStaff(currentUserEmail);
+  box.innerHTML = chatMsgs.length ? chatMsgs.map(m => {
+    const me = m.u === window._myUid, can = staff || me;
+    return `<div class="msg ${me ? "me" : ""}"><div class="who2">${esc(m.n)}${m.s ? ic("crown") : ""}</div><div class="bub">${esc(m.t)}</div><div class="t">${fmtT(m.ts)}${can ? `<button onclick="delChat('${esc(m.id)}')">حذف</button>` : ""}</div></div>`;
+  }).join("") : '<div class="sys">ابدأ المحادثة، قول أهلاً للكل!</div>';
+  if (near || force) box.scrollTop = box.scrollHeight;
+  if (chatOpen) { window._lastSeen = Date.now(); }
+}
+async function sendChat(e) {
+  e.preventDefault(); const inp = $("chatInput"), text = inp.value.trim(); if (!text) return;
+  if (isBanned(currentUserEmail)) return toast("حسابك محظور.", "err");
+  if (Date.now() - lastSend < 1500) return toast("استنى ثانية بين الرسائل.", "err");
+  lastSend = Date.now(); const btn = $("chatSend"); btn.disabled = true; inp.value = "";
+  window._myUid = window._myUid || await uid(currentUserEmail);
+  const msg = { id: Date.now().toString(36) + rand(2), u: window._myUid, n: nickOf(currentUserEmail), s: isStaff(currentUserEmail) ? 1 : 0, t: text.slice(0, 300), ts: Date.now() };
+  chatMsgs = [...chatMsgs, msg]; renderChat(true);
+  try {
+    const { id, messages } = await loadChat();
+    const next = [...messages.filter(m => m.id !== msg.id), msg].slice(-150);
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${id}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify({ messages: next }) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    chatMsgs = next;
+  } catch (err) { toast("فشل إرسال الرسالة. حاول تاني.", "err"); inp.value = text; chatMsgs = chatMsgs.filter(m => m.id !== msg.id); renderChat(true); }
+  btn.disabled = false; inp.focus();
+}
+async function delChat(id) {
+  const m = chatMsgs.find(x => x.id === id); if (!m) return;
+  if (!(isStaff(currentUserEmail) || m.u === window._myUid)) return;
+  chatMsgs = chatMsgs.filter(x => x.id !== id); renderChat(true);
+  try {
+    const { id: bid, messages } = await loadChat();
+    await fetch(`https://api.jsonbin.io/v3/b/${bid}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify({ messages: messages.filter(x => x.id !== id) }) });
+  } catch (e) { toast("فشل حذف الرسالة.", "err"); }
+}
 
 /* boot */
 (async function () {
