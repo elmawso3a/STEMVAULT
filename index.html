@@ -312,6 +312,29 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 .i-btn:hover{transform:translateY(-3px) scale(1.02)}.i-btn svg{transform:scaleX(-1)}
 .i-quick{display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
 .replay{background:none;border:none;color:var(--muted);font:700 12px 'Tajawal',sans-serif;cursor:pointer;margin-top:12px;display:block;width:100%}.replay:hover{color:var(--primary)}
+
+/* idea + teachers slides */
+.chaos{position:relative;width:260px;height:220px}
+.chaos i{position:absolute;width:42px;height:52px;border-radius:10px;background:#fff;color:#4f46e5;display:grid;place-items:center;box-shadow:0 10px 22px rgba(0,0,0,.3);left:calc(50% - 21px);top:calc(50% - 26px);animation:gather 5s ease-in-out infinite}
+.chaos i svg{width:20px;height:20px}
+.chaos i:nth-child(1){--x:-105px;--y:-80px;--r:-18deg}.chaos i:nth-child(2){--x:95px;--y:-70px;--r:14deg;background:#fde68a;color:#92400e}
+.chaos i:nth-child(3){--x:-95px;--y:70px;--r:10deg;background:#bbf7d0;color:#065f46}.chaos i:nth-child(4){--x:105px;--y:75px;--r:-12deg;background:#fecaca;color:#991b1b}
+.chaos i:nth-child(5){--x:0px;--y:-100px;--r:6deg;background:#bae6fd;color:#075985}.chaos i:nth-child(6){--x:-10px;--y:100px;--r:-8deg;background:#e9d5ff;color:#6b21a8}
+@keyframes gather{0%,12%{transform:translate(var(--x),var(--y)) rotate(var(--r))}45%,80%{transform:translate(calc(var(--k,0)*5px),calc(var(--k,0)*-5px)) rotate(calc(var(--k,0)*2deg))}100%{transform:translate(var(--x),var(--y)) rotate(var(--r))}}
+.chaos i:nth-child(1){--k:-2}.chaos i:nth-child(2){--k:-1}.chaos i:nth-child(3){--k:0}.chaos i:nth-child(4){--k:1}.chaos i:nth-child(5){--k:2}.chaos i:nth-child(6){--k:3}
+.chaos .hub{position:absolute;left:calc(50% - 46px);top:calc(50% - 46px);width:92px;height:92px;border-radius:28px;border:2px dashed rgba(199,210,254,.5);animation:pulse 2.4s infinite}
+.curate{width:290px;display:flex;flex-direction:column;gap:10px;position:relative}
+.cur{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-weight:700;font-size:14px;opacity:0;transform:translateX(-20px);text-align:start}
+.cur svg{width:18px;height:18px;flex:none}.cur em{margin-inline-start:auto;font-style:normal;font-size:12px;padding:2px 10px;border-radius:99px}
+.cur.good em{background:rgba(134,239,172,.2);color:#86efac}.cur.bad em{background:rgba(252,165,165,.2);color:#fca5a5}
+.slide.on .cur{animation:curin .6s cubic-bezier(.3,1.4,.5,1) forwards;animation-delay:calc(var(--d)*.45s + .5s)}
+.slide.on .cur.bad{animation:curin .6s cubic-bezier(.3,1.4,.5,1) forwards,curout .7s ease-in forwards;animation-delay:calc(var(--d)*.45s + .5s),calc(var(--d)*.45s + 2.6s)}
+@keyframes curin{to{opacity:1;transform:none}}
+@keyframes curout{to{opacity:0;transform:translateX(50px) scale(.9);height:0;padding:0;margin:-5px 0;border-width:0}}
+.teach{position:absolute;top:-34px;inset-inline-end:-6px;padding:6px 14px;border-radius:99px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#451a03;font-weight:800;font-size:12px;display:flex;gap:6px;align-items:center;box-shadow:0 8px 24px rgba(245,158,11,.5);animation:bob 2.4s ease-in-out infinite}
+.soon{display:inline-block;padding:4px 14px;border-radius:99px;background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.5);color:#fde68a;font-weight:800;font-size:12px}
+.road{margin-top:18px;display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.35);font-size:13px;line-height:1.7}
+.road b{color:var(--owner)}.road svg{width:26px;height:26px;color:var(--owner);flex:none;animation:wob 3s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -364,6 +387,11 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <p>بوابتك لكل ملفات ومذكرات STEM في مكان واحد منظّم.</p>
     </section>
     <section class="slide">
+      <div class="art"><div class="chaos"><div class="hub"></div><i><svg class="i"><use href="#i-file"/></svg></i><i><svg class="i"><use href="#i-file"/></svg></i><i><svg class="i"><use href="#i-img"/></svg></i><i><svg class="i"><use href="#i-file"/></svg></i><i><svg class="i"><use href="#i-img"/></svg></i><i><svg class="i"><use href="#i-file"/></svg></i></div></div>
+      <h1>إيه فكرة الموقع؟</h1>
+      <p>ملفات المذاكرة بتبقى مبعثرة على واتساب وجروبات ومحادثات. STEM Vault بيجمّعها كلها في مكان واحد، الطلاب بيرفعوها ويشاركوها، ومنظّمة حسب المادة.</p>
+    </section>
+    <section class="slide">
       <div class="art"><div class="vault"><div class="fly"><svg class="i"><use href="#i-file"/></svg></div><div class="fly"><svg class="i"><use href="#i-file"/></svg></div><div class="fly"><svg class="i"><use href="#i-img"/></svg></div><div class="vbox"></div><div class="vlid"></div><div class="vlock"><svg class="i"><use href="#i-lock"/></svg></div></div></div>
       <h1>شارك ملفاتك بسهولة</h1>
       <p>ارفع الملخصات والمذكرات حتى 4MB، ووزّعها على المواد، وافتحها من أي جهاز.</p>
@@ -380,6 +408,16 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <div class="art"><div class="chatart"><div class="cb l" style="--d:0">حد معاه ملخص الميكانيكا؟</div><div class="cb r" style="--d:.9">أيوه، لسه رافعه الآن!</div><div class="cb l" style="--d:1.8">تسلم، شكراً</div><div class="typing3"><i></i><i></i><i></i></div></div></div>
       <h1>مجتمع الطلاب بيتكلم</h1>
       <p>شات عام تسأل فيه وتساعد زمايلك، بالنيك نيم بتاعك من غير ما إيميلك يظهر.</p>
+    </section>
+    <section class="slide">
+      <div class="art"><div class="curate"><div class="teach"><svg class="i"><use href="#i-crown"/></svg>مراجعة المدرّس</div>
+        <div class="cur good" style="--d:0"><svg class="i"><use href="#i-check"/></svg>ملخص الأحياء - الفصل 3<em>مقبول</em></div>
+        <div class="cur bad" style="--d:1"><svg class="i"><use href="#i-x"/></svg>ملف مكرر / غير واضح<em>اتشال</em></div>
+        <div class="cur good" style="--d:2"><svg class="i"><use href="#i-check"/></svg>أسئلة رياضيات محلولة<em>مقبول</em></div>
+        <div class="cur bad" style="--d:3"><svg class="i"><use href="#i-x"/></svg>صورة ملهاش علاقة بالمادة<em>اتشال</em></div></div></div>
+      <span class="soon">قريباً</span>
+      <h1>المدرّسين هيراجعوا الماتيريال</h1>
+      <p>هنضيف مدرّسين كمراجعين: بياخدوا المفيد والمظبوط، ويشيلوا اللي ملوش لازمة، عشان تلاقي دايماً مصادر نضيفة وموثوقة.</p>
     </section>
     <section class="slide">
       <div class="art"><svg class="shield" viewBox="0 0 100 116"><path class="sh" d="M50 4 6 20v32c0 29 19 49 44 60 25-11 44-31 44-60V20z"/><path class="ck" d="m32 58 14 14 24-28"/></svg></div>
@@ -469,6 +507,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <button class="btn-sm danger" onclick="logout()"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
     </div>
 
+    <div class="road rv"><svg class="i"><use href="#i-crown"/></svg><div><b>قريباً:</b> هنضيف مدرّسين كمراجعين للماتيريال، يختاروا المفيد ويشيلوا اللي ملوش لازمة. <button class="link" onclick="openIntro()">اعرف فكرة الموقع</button></div></div>
     <div id="ownerSection" class="owner hidden rv from-r">
       <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
         <button class="btn-sm danger" id="clearBtn" onclick="clearAllServerFiles()"><svg class="i"><use href="#i-trash"/></svg>حذف كل الملفات</button></div>
