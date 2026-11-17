@@ -335,6 +335,23 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 .soon{display:inline-block;padding:4px 14px;border-radius:99px;background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.5);color:#fde68a;font-weight:800;font-size:12px}
 .road{margin-top:18px;display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.35);font-size:13px;line-height:1.7}
 .road b{color:var(--owner)}.road svg{width:26px;height:26px;color:var(--owner);flex:none;animation:wob 3s ease-in-out infinite}
+
+/* ===== file viewer ===== */
+#viewer{position:fixed;inset:0;z-index:400;background:rgba(7,10,26,.82);backdrop-filter:blur(8px);display:flex;flex-direction:column;animation:fade .25s both}
+@keyframes fade{from{opacity:0}}
+.v-h{display:flex;align-items:center;gap:10px;padding:12px 16px;color:#fff;background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)}
+.v-h strong{flex:1;font-size:14px;word-break:break-all;line-height:1.4}
+.v-h button{background:rgba(255,255,255,.14);border:none;color:#fff;height:36px;padding:0 12px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:6px;font:700 12px 'Tajawal',sans-serif}
+.v-h button:hover{background:rgba(255,255,255,.25)}
+.v-b{flex:1;overflow:auto;padding:16px;display:flex;justify-content:center;align-items:flex-start;-webkit-overflow-scrolling:touch}
+.v-b img{max-width:100%;max-height:100%;margin:auto;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:rise .4s both}
+.v-b video,.v-b audio{max-width:100%;margin:auto}
+.v-b iframe{width:min(900px,100%);height:100%;min-height:70vh;border:none;background:#fff;border-radius:10px}
+.v-b pre{width:min(900px,100%);background:var(--card-solid);color:var(--text);padding:18px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font:13px/1.7 ui-monospace,Menlo,Consolas,monospace;direction:ltr;text-align:left}
+.v-pdf{display:flex;flex-direction:column;gap:12px;align-items:center;width:100%}
+.v-pdf canvas{max-width:100%;height:auto!important;background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.v-msg{margin:auto;color:#fff;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.v-msg .spin{width:34px;height:34px;border-width:4px}
 </style>
 </head>
 <body>
@@ -377,6 +394,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 
 <button class="theme-btn" onclick="toggleTheme()" aria-label="تبديل الوضع"><svg class="i" id="themeIcon"><use href="#i-moon"/></svg><span id="themeText">الوضع الليلي</span></button>
 <div id="toasts"></div>
+<div id="viewer" class="hidden"><div class="v-h"><strong id="vName"></strong><button onclick="dlViewer()"><svg class="i"><use href="#i-upload" style="transform:rotate(180deg);transform-origin:center"/></svg>تحميل</button><button onclick="closeViewer()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg>إغلاق</button></div><div class="v-b" id="vBody"></div></div>
 <div id="intro" class="hidden" role="dialog" aria-label="مقدمة STEM Vault">
   <canvas id="introCv"></canvas>
   <button class="i-skip" id="iSkip" onclick="closeIntro()">تخطي</button>
@@ -1020,20 +1038,56 @@ function renderFileList(all) {
         ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')">${ic("trash")}</button>` : ""}</div></div>`;
   }).join("");
 }
+const _libs = {};
+function loadScript(u) { return _libs[u] || (_libs[u] = new Promise((ok, no) => { const t = document.createElement("script"); t.src = u; t.onload = ok; t.onerror = () => { delete _libs[u]; no(new Error("lib")); }; document.head.appendChild(t); })); }
+let viewerBlob = null, viewerName = "", viewerUrl = null;
+function extOf(n) { return ((n || "").split(".").pop() || "").toLowerCase(); }
+function kindOf(f) {
+  const t = (f.type || "").toLowerCase(), e = extOf(f.name);
+  if (t.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp"].includes(e)) return "image";
+  if (t === "application/pdf" || e === "pdf") return "pdf";
+  if (t.startsWith("video/") || ["mp4", "webm", "mov"].includes(e)) return "video";
+  if (t.startsWith("audio/") || ["mp3", "wav", "ogg", "m4a"].includes(e)) return "audio";
+  if (e === "docx") return "docx";
+  if (["xlsx", "xls", "csv"].includes(e)) return "sheet";
+  if (t.startsWith("text/") || ["txt", "md", "json", "js", "py", "java", "c", "cpp", "html", "css", "xml", "log", "tex", "yml", "yaml"].includes(e)) return "text";
+  return "other";
+}
+function closeViewer() { $("viewer").classList.add("hidden"); $("vBody").innerHTML = ""; if (viewerUrl) URL.revokeObjectURL(viewerUrl); viewerUrl = null; viewerBlob = null; document.body.style.overflow = ""; }
+function dlViewer() { if (!viewerBlob) return; const a = document.createElement("a"); viewerUrl = viewerUrl || URL.createObjectURL(viewerBlob); a.href = viewerUrl; a.download = viewerName; document.body.appendChild(a); a.click(); a.remove(); }
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("viewer").classList.contains("hidden")) closeViewer(); });
+const sandboxFrame = html => { const f = document.createElement("iframe"); f.setAttribute("sandbox", ""); f.srcdoc = `<meta charset="utf-8"><base target="_blank"><style>body{font-family:system-ui,sans-serif;line-height:1.7;padding:24px;color:#111}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px}img{max-width:100%}</style>` + html; return f; };
 async function openFile(id) {
   const file = (window.cachedFiles || []).find(f => f.id == id); if (!file) return;
-  const viewable = file.type.startsWith("image/") || file.type === "application/pdf";
-  const win = viewable ? window.open("", "_blank") : null;
-  if (win) win.document.write('<body style="font-family:sans-serif;display:grid;place-items:center;height:100vh;margin:0">جاري تحميل الملف...</body>');
-  toast("جاري تحميل الملف...");
+  const body = $("vBody"); viewerName = file.name; $("vName").innerText = file.name; document.body.style.overflow = "hidden";
+  body.innerHTML = '<div class="v-msg"><i class="spin"></i><span>جاري تحميل الملف...</span></div>'; $("viewer").classList.remove("hidden");
   try {
-    const blob = dataUrlToBlob(await readFileData(file)), url = URL.createObjectURL(blob);
-    if (win && !win.closed) win.location.href = url;
-    else { const a = document.createElement("a"); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); }
-    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    const blob = dataUrlToBlob(await readFileData(file)); viewerBlob = blob; const kind = kindOf(file); body.innerHTML = "";
+    if (kind === "image") { const i = new Image(); i.src = viewerUrl = URL.createObjectURL(blob); i.alt = file.name; body.appendChild(i); }
+    else if (kind === "video" || kind === "audio") { const m = document.createElement(kind); m.controls = true; m.src = viewerUrl = URL.createObjectURL(blob); body.appendChild(m); }
+    else if (kind === "text") { const p = document.createElement("pre"); p.textContent = await blob.text(); body.appendChild(p); }
+    else if (kind === "pdf") {
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise, wrap = document.createElement("div"); wrap.className = "v-pdf"; body.appendChild(wrap);
+      const w = Math.min(900, body.clientWidth - 32), dpr = Math.min(devicePixelRatio || 1, 2);
+      for (let n = 1; n <= pdf.numPages; n++) {
+        const pg = await pdf.getPage(n), v0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: w / v0.width * dpr }), c = document.createElement("canvas");
+        c.width = vp.width; c.height = vp.height; c.style.width = w + "px"; wrap.appendChild(c); await pg.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+      }
+    }
+    else if (kind === "docx") {
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
+      const r = await mammoth.convertToHtml({ arrayBuffer: await blob.arrayBuffer() }); body.appendChild(sandboxFrame('<div dir="auto">' + r.value + "</div>"));
+    }
+    else if (kind === "sheet") {
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+      const wb = XLSX.read(await blob.arrayBuffer(), { type: "array" });
+      body.appendChild(sandboxFrame(wb.SheetNames.map(n => `<h3>${esc(n)}</h3>` + XLSX.utils.sheet_to_html(wb.Sheets[n])).join("<hr>")));
+    }
+    else body.innerHTML = '<div class="v-msg"><span>المتصفح مش بيقدر يعرض النوع ده من الملفات (' + esc(extOf(file.name) || "غير معروف") + ').</span><span style="font-size:13px;opacity:.8">اضغط "تحميل" لو عايز تفتحه ببرنامج على جهازك.</span></div>';
   } catch (e) {
-    console.error(e); if (win) win.close();
-    toast("تعذر فتح الملف (" + (e.message || "خطأ") + "). لو الملف اترفع بنسخة قديمة جرّب ترفعه تاني.", "err");
+    console.error(e); body.innerHTML = '<div class="v-msg"><span>تعذر فتح الملف (' + esc(e.message || "خطأ") + ')</span><button class="btn-sm" style="background:#fff" onclick="openFile(\'' + esc(id) + '\')">إعادة المحاولة</button></div>';
   }
 }
 async function deleteServerFile(id) {
