@@ -18,7 +18,7 @@
 <title>STEM Vault - بوابة ملفات STEM والـ AI Agent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 :root{
@@ -352,6 +352,46 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 .v-pdf canvas{max-width:100%;height:auto!important;background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
 .v-msg{margin:auto;color:#fff;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
 .v-msg .spin{width:34px;height:34px;border-width:4px}
+
+/* ===== v3 dashboard ===== */
+.dash{width:100%;max-width:1120px}
+.hero{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 26px;border-radius:26px;color:#fff;background:radial-gradient(120% 140% at 100% 0,#7c3aed 0,#4c1d95 45%,#1e1b4b 100%);box-shadow:0 24px 50px -20px rgba(76,29,149,.6)}
+.hero .orbit{position:absolute;inset-inline-start:-30px;top:50%;width:220px;height:220px;margin-top:-110px;color:rgba(255,255,255,.16);animation:spin 40s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero .who{flex:1;min-width:240px;position:relative}
+.hero h3{color:#fff;font-size:21px}.hero small{color:rgba(255,255,255,.72)}
+.hero .avatar{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.hero .owner-tag{color:#fde68a}
+.hstats{display:flex;gap:22px;position:relative}
+.hstats span{display:flex;flex-direction:column;font-size:12px;color:rgba(255,255,255,.75);line-height:1.3}
+.hstats b{font:700 28px 'Space Grotesk','Tajawal',sans-serif;color:#fff;line-height:1.1}
+.btn-sm.out{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff;position:relative}
+.btn-sm.out:hover{background:rgba(255,255,255,.24);color:#fff;border-color:#fff}
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+@media(min-width:900px){.dgrid{grid-template-columns:350px minmax(0,1fr)}.side{position:sticky;top:18px}}
+.side,.main{display:flex;flex-direction:column;gap:18px;min-width:0}
+.main>.road,.main>.owner{margin-top:0}
+.panel{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:var(--shadow-sm)}
+.ph{font-size:14px;font-weight:800;text-align:start;margin-bottom:12px;color:var(--text)}
+.side .agent,.side .upload{margin-top:0}
+.side .upload{border-top:none;padding-top:0}
+.panel .upload label:first-child{margin-top:0}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;aspect-ratio:1/1.05;border-radius:16px;border:1px solid color-mix(in srgb,var(--c) 35%,var(--border));border-top:3px solid var(--c);background:color-mix(in srgb,var(--c) 9%,var(--card-solid));color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:'Tajawal',sans-serif;transition:transform .25s cubic-bezier(.3,1.4,.5,1),box-shadow .25s,background .25s;animation:rise .5s both;animation-delay:calc(var(--i)*70ms)}
+.tile small{position:absolute;top:6px;inset-inline-start:9px;font:600 11px 'Space Grotesk',sans-serif;color:var(--c)}
+.tile b{font:700 28px/1 'Space Grotesk',sans-serif;letter-spacing:-.02em;color:var(--c)}
+.tile span{font-size:12px;font-weight:700;color:var(--muted)}
+.tile:hover{transform:translateY(-4px) rotate(-1.5deg);box-shadow:0 14px 24px -12px var(--c)}
+.tile.on{background:var(--c);border-color:var(--c);box-shadow:0 14px 26px -10px var(--c)}
+.tile.on small,.tile.on b,.tile.on span{color:#fff}
+.tile:focus-visible,.btn:focus-visible,.btn-sm:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.lh{display:flex;justify-content:space-between;align-items:center}
+.panel .tools{margin-top:0}
+.fic{font:700 12px 'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.03em}
+.hero .link{color:#ddd6fe}
+@media(max-width:600px){.file{flex-wrap:wrap}.file .fi{flex:1 1 100%}.file .fi strong{font-size:13.5px}.file .fa{width:100%;justify-content:flex-end}}
+@media(max-width:899px){.side{display:contents}.side>.panel:first-child{order:1}.main{order:2}.side>.panel:nth-child(2){order:3}.side>.agent{order:4}}
+@media(max-width:520px){.hero{padding:18px}.hstats{order:3;width:100%}.tiles{gap:8px}.tile b{font-size:24px}}
 </style>
 </head>
 <body>
@@ -527,13 +567,42 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
   </div>
 
   <!-- 4: dashboard -->
-  <div id="step-dashboard" class="card wide view hidden">
-    <div class="dhead rv">
+  <div id="step-dashboard" class="dash view hidden">
+    <header class="hero rv">
+      <svg class="orbit" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.2"><ellipse cx="60" cy="60" rx="52" ry="20"/><ellipse cx="60" cy="60" rx="52" ry="20" transform="rotate(60 60 60)"/><ellipse cx="60" cy="60" rx="52" ry="20" transform="rotate(120 60 60)"/></g><circle cx="60" cy="60" r="6" fill="currentColor"/></svg>
       <div class="who"><div class="avatar" id="avatar">S</div>
         <div><h3>مستودع ماتيريالز STEM</h3><small id="userBadge"></small><div id="ownerBadgeContainer"></div></div></div>
-      <button class="btn-sm danger" onclick="logout()"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
+      <div class="hstats"><span><b id="hFiles">0</b>ملف مشترك</span><span><b>5</b>مواد</span></div>
+      <button class="btn-sm out" onclick="logout()"><svg class="i"><use href="#i-logout"/></svg>خروج</button>
+    </header>
+    <div class="dgrid">
+      <aside class="side">
+        <section class="panel rv"><h4 class="ph">المواد</h4><div class="tiles" id="tabs"></div></section>
+        <section class="panel rv"><h4 class="ph">رفع ملف</h4>
+    <div class="upload">
+      <label for="subjectSelect">المادة العلمية</label>
+      <select id="subjectSelect"></select>
+      <label>الملف</label>
+      <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
+        <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 50MB</small>
+      </div>
+      <input type="file" id="fileInput" class="hidden">
+      <div class="prog" id="prog"><i></i></div>
+      <button class="btn" id="uploadBtn" onclick="handleUploadFile()"><svg class="i"><use href="#i-upload"/></svg><span>رفع ومشاركة الملف</span></button>
+    </div>
+        </section>
+    <div class="agent rv">
+      <div class="row"><span class="agent-title"><svg class="i"><use href="#i-bot"/></svg>STEM Material AI Agent</span><span class="live">Active</span></div>
+      <p>الـ Agent بيفحص الملفات المرفوعة، بيرتبها حسب المادة، وبيكتشف الماتيريال الناقصة.</p>
+      <div class="agent-actions">
+        <button class="btn-sm" onclick="runAIAudit()"><svg class="i"><use href="#i-search"/></svg>تدقيق وتنظيم الملفات</button>
+        <button class="btn-sm" onclick="runAISuggestions()"><svg class="i"><use href="#i-bulb"/></svg>اقتراح مصادر ناقصة</button>
+      </div>
+      <div class="agent-res" id="agentResult"></div>
     </div>
 
+      </aside>
+      <main class="main">
     <div class="road rv"><svg class="i"><use href="#i-crown"/></svg><div><b>قريباً:</b> هنضيف مدرّسين كمراجعين للماتيريال، يختاروا المفيد ويشيلوا اللي ملوش لازمة. <button class="link" onclick="openIntro()">اعرف فكرة الموقع</button></div></div>
     <div id="ownerSection" class="owner hidden rv from-r">
       <div class="row"><b style="color:var(--owner);font-size:14px"><svg class="i"><use href="#i-crown"/></svg> لوحة تحكم المالك (Live)</b>
@@ -546,34 +615,15 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       </div>
     </div>
 
-    <div class="agent rv from-l">
-      <div class="row"><span class="agent-title"><svg class="i"><use href="#i-bot"/></svg>STEM Material AI Agent</span><span class="live">Active</span></div>
-      <p>الـ Agent بيفحص الملفات المرفوعة، بيرتبها حسب المادة، وبيكتشف الماتيريال الناقصة.</p>
-      <div class="agent-actions">
-        <button class="btn-sm" onclick="runAIAudit()"><svg class="i"><use href="#i-search"/></svg>تدقيق وتنظيم الملفات</button>
-        <button class="btn-sm" onclick="runAISuggestions()"><svg class="i"><use href="#i-bulb"/></svg>اقتراح مصادر ناقصة</button>
-      </div>
-      <div class="agent-res" id="agentResult"></div>
+        <section class="panel rv">
+          <div class="lh"><h4 class="ph" id="listHead">كل الملفات</h4></div>
+    <div class="tools"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
+          <div id="filesList"></div>
+        </section>
+      </main>
     </div>
-
-    <div class="upload rv">
-      <label for="subjectSelect">المادة العلمية</label>
-      <select id="subjectSelect"></select>
-      <label>الملف</label>
-      <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
-        <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 50MB</small>
-      </div>
-      <input type="file" id="fileInput" class="hidden">
-      <div class="prog" id="prog"><i></i></div>
-      <button class="btn" id="uploadBtn" onclick="handleUploadFile()"><svg class="i"><use href="#i-upload"/></svg><span>رفع ومشاركة الملف</span></button>
-    </div>
-
-    <div class="tools rv"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
-    <div class="tabs rv" id="tabs"></div>
-    <div id="filesList" class="rv"></div>
   </div>
 </div>
-
 <button class="fab hidden" id="chatFab" onclick="toggleChat()" aria-label="الشات"><svg class="i"><use href="#i-chat"/></svg><span class="cnt hidden" id="chatCnt">0</span></button>
 <div class="chat hidden" id="chatBox" role="dialog" aria-label="الشات العام">
   <div class="chat-h"><div>الشات العام<small id="chatSub">كل الأعضاء بيتكلموا هنا</small></div><button onclick="toggleChat()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg></button></div>
@@ -912,8 +962,10 @@ function saveLast(email) { try { const s = JSON.parse(localStorage.getItem(SESSI
 $("subjectSelect").innerHTML = Object.entries(SUBJECTS).map(([k, v]) => `<option value="${k}">${k} (${v.ar})</option>`).join("");
 function buildTabs() {
   const files = window.cachedFiles || [], cnt = k => k === "All" ? files.length : files.filter(f => f.subject === k).length;
-  $("tabs").innerHTML = [["All", "الكل", "folder"], ...Object.entries(SUBJECTS).map(([k, v]) => [k, k, v.icon])]
-    .map(([k, l, i], n) => `<button style="--i:${n}" class="tab ${currentFilter === k ? "on" : ""}" onclick="filterBy('${k}')">${ic(i)}${esc(l)}<em>${cnt(k)}</em></button>`).join("");
+  const SYM = { Biology: "Bi", Geology: "Ge", English: "En", Mechanics: "Me", Math: "Ma" };
+  $("tabs").innerHTML = [["All", "الكل", "folder", "var(--primary)", "∞"], ...Object.entries(SUBJECTS).map(([k, v]) => [k, v.ar, v.icon, v.c, SYM[k] || k.slice(0, 2)])]
+    .map(([k, l, i, c, y], n) => `<button style="--i:${n};--c:${c}" class="tile ${currentFilter === k ? "on" : ""}" onclick="filterBy('${k}')" aria-pressed="${currentFilter === k}"><small>${cnt(k)}</small><b>${y}</b><span>${esc(l)}</span></button>`).join("");
+  if ($("hFiles")) $("hFiles").innerText = files.length;
 }
 function filterBy(s) { currentFilter = s; buildTabs(); renderFileList(window.cachedFiles || []); }
 
@@ -1043,12 +1095,13 @@ function renderFileList(all) {
   const box = $("filesList"), owner = isStaff(currentUserEmail), q = ($("searchInput").value || "").trim().toLowerCase();
   let files = all; if (currentFilter !== "All") files = files.filter(f => f.subject === currentFilter);
   if (q) files = files.filter(f => (f.name || "").toLowerCase().includes(q));
+  { const sj = SUBJECTS[currentFilter]; $("listHead").innerText = (sj ? sj.ar : "كل الملفات") + " (" + files.length + ")"; }
   if (!files.length) { box.innerHTML = `<div class="empty">${ic("folder")}لا توجد ملفات في هذا القسم حالياً.</div>`; return; }
   const animate = window._fresh; window._fresh = false;
   box.innerHTML = files.map((f, i) => {
     const s = SUBJECTS[f.subject] || { c: "#6366f1" }, can = owner || f.uploader === currentUserEmail;
     return `<div class="file" data-id="${esc(f.id)}" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
-      <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${ic(fileIcon(f))}</div>
+      <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${esc((extOf(f.name) || "file").slice(0, 4))}</div>
         <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(uploaderName(f.uploader))} • ${esc(f.date)}</div></div></div>
       <div class="fa"><span class="badge" style="background:${s.c}22;color:${s.c}">${esc(f.subject)}</span>
         <button class="btn-sm" onclick="openFile('${esc(f.id)}')">${ic("open")}فتح</button>
