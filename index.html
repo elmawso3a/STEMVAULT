@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#4f46e5">
+<meta name="color-scheme" content="light dark">
+<meta name="application-name" content="STEM Vault">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22STEM%20Vault%22%2C%22short_name%22%3A%22STEM%20Vault%22%2C%22lang%22%3A%22ar%22%2C%22dir%22%3A%22rtl%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080b14%22%2C%22theme_color%22%3A%22%234f46e5%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%2F%2Fwww.w3.org%2F2000%2Fsvg%2527%2520viewBox%253D%25270%25200%252064%252064%2527%253E%253Crect%2520width%253D%252764%2527%2520height%253D%252764%2527%2520rx%253D%252716%2527%2520fill%253D%2527%25234f46e5%2527%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 <meta name="description" content="STEM Vault: منصة مجانية لمشاركة وتنظيم ملفات ومذكرات STEM (أحياء، جيولوجيا، إنجليزي، ميكانيكا، رياضيات) مع مساعد ذكاء اصطناعي لتنظيم المواد.">
 <meta name="keywords" content="STEM Vault, ملفات STEM, مذكرات, أحياء, جيولوجيا, ميكانيكا, رياضيات, مدارس STEM, مشاركة ملفات">
 <meta name="robots" content="index, follow, max-image-preview:large">
@@ -392,6 +396,50 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 @media(max-width:600px){.file{flex-wrap:wrap}.file .fi{flex:1 1 100%}.file .fi strong{font-size:13.5px}.file .fa{width:100%;justify-content:flex-end}}
 @media(max-width:899px){.side{display:contents}.side>.panel:first-child{order:1}.main{order:2}.side>.panel:nth-child(2){order:3}.side>.agent{order:4}}
 @media(max-width:520px){.hero{padding:18px}.hstats{order:3;width:100%}.tiles{gap:8px}.tile b{font-size:24px}}
+
+/* ===== v4 pro polish ===== */
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:8px}
+input:focus-visible,select:focus-visible{outline:none}
+.skip{position:fixed;top:-60px;inset-inline-start:16px;z-index:1000;background:var(--primary);color:#fff;padding:10px 16px;border-radius:10px;font-weight:800;text-decoration:none;transition:top .2s}
+.skip:focus{top:12px}
+.offline{position:fixed;top:0;inset-inline:0;z-index:900;background:var(--err);color:#fff;text-align:center;font-weight:800;font-size:13px;padding:8px 12px;transform:translateY(-100%);transition:transform .3s}
+.offline.on{transform:none}
+.mdl{position:fixed;inset:0;z-index:700;background:rgba(7,10,26,.6);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;animation:fade .2s both}
+.mdl-box{width:min(420px,100%);background:var(--card-solid);border:1px solid var(--border);border-radius:22px;padding:24px;box-shadow:var(--shadow);animation:rise .3s both}
+.mdl-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(225,29,72,.12);color:var(--err);margin-bottom:12px}
+.mdl-ic svg{width:26px;height:26px}
+.mdl-box h3{text-align:start;font-size:18px;margin-bottom:6px}
+.mdl-box p{color:var(--muted);font-size:14px;line-height:1.7;word-break:break-word}
+.mdl-act{display:flex;gap:10px;margin-top:20px}
+.mdl-act .btn{margin-top:0;flex:1}
+.mdl-act .btn.cancel{background:var(--input);color:var(--text);box-shadow:none;border:1px solid var(--border)}
+.mdl-act .btn.cancel::after,.mdl-act .btn.dng::after{display:none}
+.mdl-act .btn.dng{background:var(--err);box-shadow:0 8px 22px -8px var(--err)}
+.pw{display:flex;gap:4px;margin-top:8px;align-items:center}
+.pw i{flex:1;height:4px;border-radius:9px;background:var(--border);transition:background .3s}
+.pw[data-s="1"] i:nth-child(-n+1){background:var(--err)}
+.pw[data-s="2"] i:nth-child(-n+2){background:#f59e0b}
+.pw[data-s="3"] i:nth-child(-n+3){background:#84cc16}
+.pw[data-s="4"] i{background:var(--ok)}
+.pw span{font-size:11.5px;color:var(--muted);font-weight:700;min-width:48px;text-align:end}
+.tools{align-items:stretch}
+.search .clr{position:absolute;top:50%;inset-inline-end:8px;transform:translateY(-50%);width:28px;height:28px;border:none;border-radius:8px;background:var(--border);color:var(--muted);cursor:pointer;display:none;place-items:center}
+.search.has .clr{display:grid}.search input{padding-inline-end:42px}
+.search kbd{position:absolute;top:50%;inset-inline-end:12px;transform:translateY(-50%);font:600 11px 'Space Grotesk',monospace;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:1px 7px;pointer-events:none;background:var(--card-solid)}
+.search.has kbd,.search:focus-within kbd{display:none}
+.sortsel{width:auto;min-width:130px;flex:none;padding-block:11px;font-weight:700;cursor:pointer}
+mark{background:color-mix(in srgb,var(--primary2) 28%,transparent);color:inherit;border-radius:4px;padding:0 2px}
+.lcount{font-size:12px;color:var(--muted);margin:10px 2px 0;font-weight:700}
+.errbox{text-align:center;padding:30px 12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:12px}
+.errbox svg{width:42px;height:42px;color:var(--err)}
+.empty .btn-sm{margin-top:12px}
+.kind{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--input);border:1px solid var(--border);padding:1px 8px;border-radius:99px}
+.prog b{display:none}
+.pct{font:700 12px 'Space Grotesk',sans-serif;color:var(--muted);text-align:center;margin-top:6px;display:none}
+.toast{cursor:pointer}
+.file .btn-sm{min-height:36px}
+@media (hover:none){.file:hover,.tile:hover{transform:none}}
+@media(max-width:520px){.sortsel{flex:1 1 100%}.mdl-act{flex-direction:column-reverse}}
 </style>
 </head>
 <body>
@@ -433,8 +481,11 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 <div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid-bg"></div></div>
 
 <button class="theme-btn" onclick="toggleTheme()" aria-label="تبديل الوضع"><svg class="i" id="themeIcon"><use href="#i-moon"/></svg><span id="themeText">الوضع الليلي</span></button>
-<div id="toasts"></div>
-<div id="viewer" class="hidden"><div class="v-h"><strong id="vName"></strong><button onclick="dlViewer()"><svg class="i"><use href="#i-upload" style="transform:rotate(180deg);transform-origin:center"/></svg>تحميل</button><button onclick="closeViewer()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg>إغلاق</button></div><div class="v-b" id="vBody"></div></div>
+<a class="skip" href="#step-dashboard" onclick="var m=document.querySelector('.view:not(.hidden)');if(m){m.setAttribute('tabindex','-1');m.focus()}return false">تخطي إلى المحتوى</a>
+<div class="offline" id="offline" role="status">أنت غير متصل بالإنترنت. هنكمّل أول ما الاتصال يرجع.</div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<div class="mdl hidden" id="mdl" role="alertdialog" aria-modal="true" aria-labelledby="mdlT" aria-describedby="mdlP"><div class="mdl-box"><div class="mdl-ic"><svg class="i"><use href="#i-alert"/></svg></div><h3 id="mdlT"></h3><p id="mdlP"></p><div class="mdl-act"><button class="btn cancel" id="mdlNo" type="button">إلغاء</button><button class="btn dng" id="mdlYes" type="button">تأكيد</button></div></div></div>
+<div id="viewer" class="hidden" role="dialog" aria-modal="true" aria-label="عارض الملفات"><div class="v-h"><strong id="vName"></strong><button onclick="dlViewer()"><svg class="i"><use href="#i-upload" style="transform:rotate(180deg);transform-origin:center"/></svg>تحميل</button><button onclick="closeViewer()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg>إغلاق</button></div><div class="v-b" id="vBody"></div></div>
 <div id="intro" class="hidden" role="dialog" aria-label="مقدمة STEM Vault">
   <canvas id="introCv"></canvas>
   <button class="i-skip" id="iSkip" onclick="closeIntro()">تخطي</button>
@@ -513,7 +564,8 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
       <label for="userEmail">البريد الإلكتروني</label>
       <div class="field"><svg class="i"><use href="#i-mail"/></svg><input type="email" id="userEmail" placeholder="student@example.com" required autocomplete="email"></div>
       <label for="userPassword">كلمة المرور</label>
-      <div class="field"><svg class="i"><use href="#i-lock"/></svg><input type="password" id="userPassword" placeholder="••••••••" required minlength="6" autocomplete="current-password"><button type="button" class="eye" onclick="togglePass('userPassword',this)" aria-label="إظهار"><svg class="i"><use href="#i-eye"/></svg></button></div>
+      <div class="field"><svg class="i"><use href="#i-lock"/></svg><input type="password" id="userPassword" placeholder="••••••••" required minlength="6" autocomplete="current-password" oninput="pwMeter(this.value)"><button type="button" class="eye" onclick="togglePass('userPassword',this)" aria-label="إظهار"><svg class="i"><use href="#i-eye"/></svg></button></div>
+      <div class="pw hidden" id="pwMeter" data-s="0" aria-hidden="true"><i></i><i></i><i></i><i></i><span id="pwTxt"></span></div>
       <div id="forgotRow" class="hidden" style="margin-top:8px"><button type="button" class="link" onclick="openForgot()">نسيت كلمة المرور؟</button></div>
       <button class="btn" id="authBtn" type="submit"><span>إنشاء الحساب واستلام كود التأكيد</span></button>
     </form>
@@ -587,7 +639,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
         <svg class="i"><use href="#i-upload"/></svg><b id="dropName">اسحب الملف هنا أو اضغط للاختيار</b><small>الحد الأقصى 50MB</small>
       </div>
       <input type="file" id="fileInput" class="hidden">
-      <div class="prog" id="prog"><i></i></div>
+      <div class="prog" id="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i></i></div><div class="pct" id="pct"></div>
       <button class="btn" id="uploadBtn" onclick="handleUploadFile()"><svg class="i"><use href="#i-upload"/></svg><span>رفع ومشاركة الملف</span></button>
     </div>
         </section>
@@ -617,8 +669,9 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 
         <section class="panel rv">
           <div class="lh"><h4 class="ph" id="listHead">كل الملفات</h4></div>
-    <div class="tools"><div class="field search"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" placeholder="ابحث باسم الملف..." oninput="renderFileList(window.cachedFiles||[])"></div></div>
-          <div id="filesList"></div>
+    <div class="tools"><div class="field search" id="searchBox"><svg class="i"><use href="#i-search"/></svg><input id="searchInput" type="search" placeholder="ابحث باسم الملف أو اسم الرافع..." aria-label="بحث في الملفات" oninput="onSearch()"><kbd>/</kbd><button type="button" class="clr" onclick="clearSearch()" aria-label="مسح البحث"><svg class="i"><use href="#i-x"/></svg></button></div>
+            <select id="sortSel" class="sortsel" aria-label="ترتيب الملفات" onchange="onSort()"><option value="new">الأحدث أولاً</option><option value="old">الأقدم أولاً</option><option value="name">الاسم (أ-ي)</option><option value="size">الأكبر حجماً</option></select></div>
+          <div id="filesList" aria-live="polite"></div>
         </section>
       </main>
     </div>
@@ -627,7 +680,7 @@ input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--
 <button class="fab hidden" id="chatFab" onclick="toggleChat()" aria-label="الشات"><svg class="i"><use href="#i-chat"/></svg><span class="cnt hidden" id="chatCnt">0</span></button>
 <div class="chat hidden" id="chatBox" role="dialog" aria-label="الشات العام">
   <div class="chat-h"><div>الشات العام<small id="chatSub">كل الأعضاء بيتكلموا هنا</small></div><button onclick="toggleChat()" aria-label="إغلاق"><svg class="i"><use href="#i-x"/></svg></button></div>
-  <div class="msgs" id="msgs"></div>
+  <div class="msgs" id="msgs" role="log" aria-live="polite"></div>
   <form class="chat-f" onsubmit="sendChat(event)"><input id="chatInput" maxlength="300" placeholder="اكتب رسالتك..." autocomplete="off"><button id="chatSend" type="submit" aria-label="إرسال"><svg class="i"><use href="#i-send"/></svg></button></form>
 </div>
 <script>
@@ -749,7 +802,7 @@ function switchAuthTab(mode) {
   $("forgotRow").classList.toggle("hidden", mode !== "login");
   $("authBtn").querySelector("span").innerText = mode === "register" ? "إنشاء الحساب واستلام كود التأكيد" : "دخول";
   $("authSubtitle").innerText = mode === "register" ? "أنشئ حسابك وفعّله بكود يوصلك على الإيميل (مرة واحدة)" : "أهلاً بيك تاني! الجهاز المسجّل بيدخل لوحده";
-  $("userPassword").autocomplete = mode === "register" ? "new-password" : "current-password";
+  $("userPassword").autocomplete = mode === "register" ? "new-password" : "current-password"; pwMeter($("userPassword").value);
 }
 function openForgot() { $("forgotEmail").value = $("userEmail").value; show("step-forgot"); }
 function backToAuth() { clearInterval(resendTimer); show("step-auth"); }
@@ -973,11 +1026,12 @@ function countUp(el, to) {
   const from = +el.innerText || 0; if (from === to) return; const t0 = performance.now();
   (function f(t) { const p = Math.min(1, (t - t0) / 700); el.innerText = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); })(t0);
 }
+function retryLoad(b) { b.disabled = true; $("filesList").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; syncWithServer(); }
 let syncing = false;
 async function syncWithServer() {
   if (syncing) return; syncing = true;
   let d; try { d = await fetchServerData(); } finally { syncing = false; }
-  if (!d) return;
+  if (!d) { if (!window.cachedFiles) $("filesList").innerHTML = `<div class="errbox">${ic("alert")}<span>تعذر تحميل الملفات. اتأكد من الإنترنت وجرّب تاني.</span><button class="btn-sm" onclick="retryLoad(this)">${ic("refresh")}إعادة المحاولة</button></div>`; return; }
   countUp($("statTotalUsers"), d.users.length); countUp($("statTotalFiles"), d.files.length);
   const sig = d.files.map(f => f.id).join(",");
   window.cachedFiles = d.files;
@@ -1052,7 +1106,7 @@ function canBan(email) {
 }
 async function banUser(email, flag) {
   if (!canBan(email)) return toast("مش مسموح تحظر الحساب ده.", "err");
-  if (flag && !confirm("حظر " + email + " ؟ مش هيقدر يدخل الموقع.")) return;
+  if (flag && !(await askConfirm("حظر المستخدم؟", email + " مش هيقدر يدخل الموقع بعد الحظر.", "حظر"))) return;
   await fetchServerData();
   const u = currentServerData.users.find(x => x.email === email); if (!u) return toast("المستخدم غير موجود.", "err");
   u.banned = flag; if (flag) u.devices = [];
@@ -1079,33 +1133,34 @@ async function handleUploadFile() {
   setBusy(btn, true, "جاري الرفع..."); const pr = $("prog"); pr.style.display = "block"; pr.firstChild.style.width = "5%";
   const id = Date.now().toString(), ext = (extOf(file.name) || "bin").replace(/[^a-z0-9]/g, "").slice(0, 8) || "bin", path = `${id}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
   try {
-    await sbUpload(file, path, p => pr.firstChild.style.width = 5 + 85 * p + "%");
+    await sbUpload(file, path, p => { pr.firstChild.style.width = 5 + 85 * p + "%"; $("pct").style.display = "block"; $("pct").innerText = Math.round(p * 100) + "%"; pr.setAttribute("aria-valuenow", Math.round(p * 100)); });
     const rec = { id, name: file.name, type: file.type || "application/octet-stream", size: file.size > 1048576 ? (file.size / 1048576).toFixed(2) + " MB" : (file.size / 1024).toFixed(1) + " KB", subject, date: new Date().toLocaleDateString("ar-EG"), uploader: currentUserEmail, path };
     await fetchServerData(); currentServerData.files.unshift(rec);
     if (!(await updateServerData(currentServerData))) throw new Error("meta");
     pr.firstChild.style.width = "100%"; toast("تم رفع ومشاركة الملف بنجاح!", "ok");
     fi.value = ""; $("dropName").innerText = "اسحب الملف هنا أو اضغط للاختيار"; window._sig = null; syncWithServer();
   } catch (err) { console.error(err); deleteBins({ path }); toast("فشل الرفع: " + (/storage 4(0[13]|03)|row-level/i.test(err.message) ? "صلاحية الرفع مش متفعلة في Supabase" : "جرّب تاني"), "err"); }
-  setTimeout(() => { pr.style.display = "none"; pr.firstChild.style.width = "0"; }, 500);
+  setTimeout(() => { pr.style.display = "none"; pr.firstChild.style.width = "0"; $("pct").style.display = "none"; }, 500);
   setBusy(btn, false, "رفع ومشاركة الملف");
 }
 
 function fileIcon(f) { return (f.type || "").startsWith("image/") ? "img" : "file"; }
 function renderFileList(all) {
-  const box = $("filesList"), owner = isStaff(currentUserEmail), q = ($("searchInput").value || "").trim().toLowerCase();
-  let files = all; if (currentFilter !== "All") files = files.filter(f => f.subject === currentFilter);
-  if (q) files = files.filter(f => (f.name || "").toLowerCase().includes(q));
+  const box = $("filesList"), owner = isStaff(currentUserEmail), q = ($("searchInput").value || "").trim(), ql = q.toLowerCase();
+  let files = all.slice(); if (currentFilter !== "All") files = files.filter(f => f.subject === currentFilter);
+  if (ql) files = files.filter(f => (f.name || "").toLowerCase().includes(ql) || nickOf(f.uploader).toLowerCase().includes(ql));
+  if (sortMode === "old") files.reverse(); else if (sortMode === "name") files.sort((a, b) => (a.name || "").localeCompare(b.name || "", "ar")); else if (sortMode === "size") files.sort((a, b) => sizeNum(b) - sizeNum(a));
   { const sj = SUBJECTS[currentFilter]; $("listHead").innerText = (sj ? sj.ar : "كل الملفات") + " (" + files.length + ")"; }
-  if (!files.length) { box.innerHTML = `<div class="empty">${ic("folder")}لا توجد ملفات في هذا القسم حالياً.</div>`; return; }
+  if (!files.length) { box.innerHTML = `<div class="empty">${ic(q ? "search" : "folder")}${q ? "مفيش نتائج للبحث ده." : "لا توجد ملفات في هذا القسم حالياً."}<br>${q ? `<button class="btn-sm" onclick="clearSearch()">مسح البحث</button>` : `<button class="btn-sm" onclick="document.getElementById('fileInput').click()">${ic("upload")}كن أول من يرفع ملف</button>`}</div>`; return; }
   const animate = window._fresh; window._fresh = false;
   box.innerHTML = files.map((f, i) => {
     const s = SUBJECTS[f.subject] || { c: "#6366f1" }, can = owner || f.uploader === currentUserEmail;
     return `<div class="file" data-id="${esc(f.id)}" style="${animate ? `animation-delay:${Math.min(i, 10) * 50}ms` : "animation:none"}">
       <div class="fi"><div class="fic" style="background:linear-gradient(135deg,${s.c},${s.c}bb)">${esc((extOf(f.name) || "file").slice(0, 4))}</div>
-        <div style="min-width:0"><strong>${esc(f.name)}</strong><div class="meta">${esc(f.size)} • ${esc(uploaderName(f.uploader))} • ${esc(f.date)}</div></div></div>
+        <div style="min-width:0"><strong>${hl(f.name, q)}</strong><div class="meta"><bdi dir="ltr">${esc(f.size)}</bdi> • ${esc(uploaderName(f.uploader))} • ${esc(f.date)}</div></div></div>
       <div class="fa"><span class="badge" style="background:${s.c}22;color:${s.c}">${esc(f.subject)}</span>
-        <button class="btn-sm" onclick="openFile('${esc(f.id)}')">${ic("open")}فتح</button>
-        ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')">${ic("trash")}</button>` : ""}</div></div>`;
+        <button class="btn-sm" onclick="openFile('${esc(f.id)}')" aria-label="فتح ${esc(f.name)}">${ic("open")}فتح</button>
+        ${can ? `<button class="btn-sm danger" onclick="deleteServerFile('${esc(f.id)}')" aria-label="حذف ${esc(f.name)}">${ic("trash")}</button>` : ""}</div></div>`;
   }).join("");
 }
 const _libs = {};
@@ -1161,14 +1216,14 @@ async function openFile(id) {
   }
 }
 async function deleteServerFile(id) {
-  if (!confirm("هل أنت متأكد من حذف هذا الملف؟")) return;
+  if (!(await askConfirm("حذف الملف؟", "الملف هيتشال من السيرفر نهائياً ومش هتقدر ترجعه.", "حذف"))) return;
   const card = document.querySelector(`.file[data-id="${id}"]`); if (card) { card.classList.add("leaving"); await new Promise(r => setTimeout(r, 330)); }
   await fetchServerData(); deleteBins(currentServerData.files.find(f => f.id == id) || {}); currentServerData.files = currentServerData.files.filter(f => f.id != id);
   if (await updateServerData(currentServerData)) toast("تم حذف الملف.", "ok"); else toast("فشل الحذف.", "err");
   window._sig = null; syncWithServer();
 }
 async function clearAllServerFiles() {
-  if (!confirm("تحذير: مسح جميع الملفات من السيرفر نهائياً؟")) return;
+  if (!(await askConfirm("مسح كل الملفات؟", "تحذير: كل الملفات المشتركة هتتمسح نهائياً لكل الطلاب.", "امسح الكل"))) return;
   await fetchServerData(); currentServerData.files.forEach(deleteBins); currentServerData.files = [];
   if (await updateServerData(currentServerData)) toast("تم مسح كافة الملفات.", "ok"); else toast("فشل المسح.", "err");
   window._sig = null; syncWithServer();
@@ -1317,6 +1372,48 @@ function closeIntro() {
 }
 addEventListener("keydown", e => { if (!introOpen) return; if (e.key === "ArrowLeft") introNext(); if (e.key === "ArrowRight") introGo(introIdx - 1); if (e.key === "Escape") closeIntro(); });
 (function () { let x0 = null; const st = $("intro"); st.addEventListener("touchstart", e => x0 = e.touches[0].clientX, { passive: true }); st.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 50) dx < 0 ? introNext() : introGo(introIdx - 1); }); })();
+
+
+/* ===== v4 pro polish ===== */
+let _mdlRes = null, _mdlPrev = null;
+function askConfirm(title, text, yes) {
+  return new Promise(res => {
+    _mdlRes = res; _mdlPrev = document.activeElement;
+    $("mdlT").innerText = title; $("mdlP").innerText = text; $("mdlYes").innerText = yes || "تأكيد";
+    $("mdl").classList.remove("hidden"); setTimeout(() => $("mdlNo").focus(), 30);
+  });
+}
+function closeMdl(v) { $("mdl").classList.add("hidden"); const r = _mdlRes; _mdlRes = null; if (_mdlPrev && _mdlPrev.focus) try { _mdlPrev.focus(); } catch (e) {} if (r) r(v); }
+$("mdlNo").onclick = () => closeMdl(false); $("mdlYes").onclick = () => closeMdl(true);
+$("mdl").addEventListener("click", e => { if (e.target === $("mdl")) closeMdl(false); });
+addEventListener("keydown", e => {
+  if (!$("mdl").classList.contains("hidden")) {
+    if (e.key === "Escape") { e.preventDefault(); closeMdl(false); }
+    if (e.key === "Tab") { const b = [$("mdlNo"), $("mdlYes")], i = b.indexOf(document.activeElement); e.preventDefault(); b[(i + (e.shiftKey ? -1 : 1) + 2) % 2].focus(); }
+    return;
+  }
+  if (e.key === "Escape" && chatOpen) toggleChat();
+  if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName) && !$("step-dashboard").classList.contains("hidden") && $("viewer").classList.contains("hidden")) { e.preventDefault(); $("searchInput").focus(); }
+});
+/* password strength */
+function pwMeter(v) {
+  const m = $("pwMeter"); m.classList.toggle("hidden", authMode !== "register" || !v);
+  let sc = 0; if (v.length >= 6) sc++; if (v.length >= 10) sc++; if (/[A-Za-z]/.test(v) && /\d/.test(v)) sc++; if (/[^A-Za-z0-9]/.test(v) || (/[a-z]/.test(v) && /[A-Z]/.test(v) && v.length >= 8)) sc++;
+  if (v.length < 6) sc = Math.min(sc, 1);
+  m.dataset.s = v ? Math.max(1, sc) : 0; $("pwTxt").innerText = ["", "ضعيفة", "متوسطة", "جيدة", "قوية"][v ? Math.max(1, sc) : 0];
+}
+/* search + sort */
+let sortMode = "new", _st = 0;
+function onSearch() { $("searchBox").classList.toggle("has", !!$("searchInput").value); clearTimeout(_st); _st = setTimeout(() => renderFileList(window.cachedFiles || []), 120); }
+function clearSearch() { $("searchInput").value = ""; onSearch(); $("searchInput").focus(); }
+function onSort() { sortMode = $("sortSel").value; try { localStorage.setItem("sv_sort", sortMode); } catch (e) {} renderFileList(window.cachedFiles || []); }
+try { const sv = localStorage.getItem("sv_sort"); if (sv && ["new", "old", "name", "size"].includes(sv)) { sortMode = sv; $("sortSel").value = sv; } } catch (e) {}
+const sizeNum = f => { const m = String(f.size || "").match(/([\d.]+)\s*(KB|MB)/i); return m ? parseFloat(m[1]) * (/MB/i.test(m[2]) ? 1024 : 1) : 0; };
+const hl = (t, q) => { const x = esc(t); if (!q) return x; const e = esc(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); return x.replace(new RegExp(e, "gi"), m => `<mark>${m}</mark>`); };
+/* offline banner */
+function netUI() { $("offline").classList.toggle("on", !navigator.onLine); }
+addEventListener("online", () => { netUI(); if (currentUserEmail) syncWithServer(); }); addEventListener("offline", netUI); netUI();
+document.addEventListener("click", e => { const t = e.target.closest(".toast"); if (t) { t.classList.add("out"); setTimeout(() => t.remove(), 300); } });
 
 /* boot */
 (async function () {
